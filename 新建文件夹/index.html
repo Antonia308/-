@@ -1,0 +1,1570 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ed">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="一餐灵感">
+  <title>今天吃什么 - 食材灵感</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f5f4ed;
+      --ink: #20271f;
+      --muted: #777c70;
+      --line: #e4e4d9;
+      --green: #285a42;
+      --green-light: #e8efe6;
+      --coral: #dd674c;
+      --yellow: #f3c85c;
+      --white: #fffefa;
+      font-family: "DM Sans", "Microsoft YaHei", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: radial-gradient(#68765d 0.55px, transparent 0.55px);
+      background-size: 16px 16px;
+      background-attachment: fixed;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    .shell { width: min(1180px, calc(100% - 56px)); margin: 0 auto; }
+    .topbar { height: 78px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #dfe0d5; }
+    .brand { display: flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; font-weight: 700; }
+    .brand-mark { display: grid; width: 35px; height: 35px; place-items: center; border-radius: 50%; color: #fff; background: var(--green); font-size: 17px; }
+    .brand small { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; font-weight: 500; letter-spacing: 0; }
+    .top-note { color: var(--muted); font-size: 13px; }
+    .top-note span { color: var(--coral); }
+    .install-button { display: inline-flex; align-items: center; gap: 7px; padding: 9px 12px; border: 1px solid var(--green); border-radius: 3px; color: var(--green); background: transparent; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .install-button:hover { color: #fff; background: var(--green); }
+    .install-button[hidden] { display: none; }
+    main { padding: 36px 0 72px; }
+    .intro { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin: 0 0 28px; }
+    .eyebrow { display: flex; align-items: center; gap: 8px; margin: 0 0 11px; color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
+    .eyebrow::before { width: 20px; height: 2px; background: var(--coral); content: ""; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 8px; font-family: "Noto Serif SC", "Songti SC", serif; font-size: clamp(30px, 4vw, 43px); font-weight: 700; line-height: 1.25; letter-spacing: 0; }
+    h1 em { color: var(--coral); font-style: normal; }
+    .intro-copy { max-width: 520px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+    .date-stamp { flex: 0 0 auto; padding: 11px 15px; border: 1px solid #dfe0d5; border-radius: 4px; color: var(--green); font-size: 12px; }
+    .date-stamp strong { margin-right: 5px; color: var(--coral); }
+    .workspace { display: grid; grid-template-columns: 350px minmax(0, 1fr); align-items: start; gap: 27px; }
+    .pantry { overflow: hidden; border: 1px solid var(--line); border-radius: 5px; background: var(--white); }
+    .pantry-head { padding: 22px 22px 18px; border-bottom: 1px solid var(--line); }
+    .section-kicker { margin: 0 0 6px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+    h2 { margin-bottom: 0; font-family: "Noto Serif SC", "Songti SC", serif; font-size: 21px; font-weight: 600; letter-spacing: 0; }
+    .pantry-body { padding: 18px 22px 21px; }
+    .ingredient-input-wrap { display: flex; align-items: center; gap: 8px; padding: 5px; border: 1px solid #dfe0d5; border-radius: 4px; transition: border-color .18s, box-shadow .18s; }
+    .ingredient-input-wrap:focus-within { border-color: var(--green); box-shadow: 0 0 0 3px #285a4218; }
+    .ingredient-input-wrap input { width: 100%; min-width: 0; padding: 8px 7px; border: 0; outline: 0; background: transparent; font-size: 13px; }
+    .ingredient-input-wrap input::placeholder { color: #a5a89d; }
+    .add-button { flex: 0 0 auto; width: 34px; height: 34px; border: 0; border-radius: 3px; color: #fff; background: var(--green); cursor: pointer; font-size: 20px; line-height: 1; }
+    .input-hint { margin: 8px 0 17px; color: #8a8d82; font-size: 11px; }
+    .chip-list { display: flex; flex-wrap: wrap; gap: 7px; min-height: 2px; }
+    .chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 9px 7px 11px; border: 1px solid #d9e3d8; border-radius: 3px; color: #315540; background: #eff4ec; font-size: 12px; animation: pop .16s ease-out; }
+    .chip button { width: 16px; height: 16px; padding: 0; border: 0; color: #69806b; background: transparent; cursor: pointer; font-size: 15px; line-height: 14px; }
+    .empty-pantry { width: 100%; padding: 12px; border: 1px dashed #dfe0d5; color: #8a8d82; font-size: 12px; text-align: center; }
+    .suggestions { margin-top: 21px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .suggestions-title { display: flex; justify-content: space-between; margin-bottom: 11px; color: var(--muted); font-size: 11px; }
+    .suggestions-title span:last-child { color: #9a9d92; }
+    .suggestion-list { display: flex; flex-wrap: wrap; gap: 7px; }
+    .suggestion { padding: 7px 10px; border: 1px solid #e6e6dc; border-radius: 3px; background: transparent; cursor: pointer; font-size: 12px; transition: background .15s, border-color .15s; }
+    .suggestion:hover { border-color: #a7b7a4; background: var(--green-light); }
+    .pantry-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 22px; border-top: 1px solid var(--line); background: #fafaf5; }
+    .pantry-count { color: var(--muted); font-size: 11px; }
+    .clear-button { padding: 4px 0; border: 0; color: #8b8f84; background: transparent; cursor: pointer; font-size: 11px; }
+    .clear-button:hover { color: var(--coral); }
+    .results { min-width: 0; }
+    .result-banner { position: relative; display: flex; min-height: 168px; align-items: end; overflow: hidden; padding: 23px 25px; border-radius: 5px; color: white; background: #263b2f; }
+    .result-banner::before { position: absolute; inset: 0; background: linear-gradient(90deg, #172b20 0%, #172b20d9 37%, #172b2040 100%), url("https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=82") center 43% / cover; content: ""; transition: transform .5s ease; }
+    .result-banner:hover::before { transform: scale(1.025); }
+    .banner-content { position: relative; z-index: 1; max-width: 380px; }
+    .banner-tag { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; padding: 5px 8px; border-radius: 2px; color: #f5d783; background: #ffffff20; font-size: 10px; }
+    .banner-tag span { color: var(--yellow); }
+    .banner-title { margin: 0 0 5px; font-family: "Noto Serif SC", "Songti SC", serif; font-size: 23px; font-weight: 600; letter-spacing: 0; }
+    .banner-copy { margin: 0; color: #e1e8dc; font-size: 12px; line-height: 1.6; }
+    .mode-tabs { display: flex; flex-wrap: wrap; gap: 5px; margin: 18px 0 0; border-bottom: 1px solid var(--line); }
+    .mode-tab { padding: 10px 13px; border: 0; border-bottom: 2px solid transparent; color: var(--muted); background: transparent; cursor: pointer; font-size: 12px; }
+    .mode-tab[aria-selected="true"] { border-bottom-color: var(--coral); color: var(--green); font-weight: 700; }
+    .mode-tab:hover { color: var(--green); }
+    .howtocook-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 16px 0 12px; }
+    .howtocook-status { color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .howtocook-refresh { flex: 0 0 auto; padding: 7px 10px; border: 1px solid var(--green); border-radius: 3px; color: var(--green); background: var(--white); cursor: pointer; font-size: 11px; }
+    .howtocook-refresh:disabled { opacity: .55; cursor: wait; }
+    .howtocook-credit { margin: 15px 0; color: var(--muted); font-size: 10px; line-height: 1.7; }
+    .howtocook-credit a, .howtocook-source { color: var(--green); }
+    .howtocook-source { display: inline-block; margin-top: 12px; font-size: 10px; }
+    .howtocook-note { margin: 12px 0 0; padding: 9px 11px; border-left: 2px solid var(--yellow); color: #62685e; background: #faf8ef; font-size: 10px; line-height: 1.6; }
+    .prep-intro { margin: 20px 0 14px; }
+    .prep-intro h2 { margin-bottom: 5px; font-size: 18px; }
+    .prep-intro p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .prep-search { display: flex; gap: 8px; padding: 5px; border: 1px solid #dfe0d5; border-radius: 4px; background: var(--white); }
+    .prep-search:focus-within { border-color: var(--green); box-shadow: 0 0 0 3px #285a4218; }
+    .prep-search input { flex: 1; min-width: 0; padding: 8px; border: 0; outline: 0; background: transparent; font-size: 13px; }
+    .prep-search button { padding: 0 13px; border: 0; border-radius: 3px; color: #fff; background: var(--green); cursor: pointer; font-size: 12px; }
+    .prep-suggestions { margin: 15px 0 19px; }
+    .prep-suggestions-title { margin-bottom: 9px; color: var(--muted); font-size: 10px; }
+    .prep-suggestion-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .prep-suggestion { padding: 6px 9px; border: 1px solid #e3e4da; border-radius: 3px; background: var(--white); cursor: pointer; font-size: 11px; }
+    .prep-suggestion:hover { border-color: #a7b7a4; background: var(--green-light); }
+    .prep-guides { display: grid; gap: 10px; }
+    .prep-guide { padding: 17px 19px; border: 1px solid var(--line); border-radius: 4px; background: var(--white); }
+    .prep-guide h3 { margin: 0 0 12px; font-family: "Noto Serif SC", "Songti SC", serif; font-size: 16px; font-weight: 600; }
+    .prep-guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px 20px; }
+    .prep-guide-block { padding-top: 9px; border-top: 1px solid var(--line); }
+    .prep-guide-block h4 { margin: 0 0 5px; color: var(--green); font-size: 10px; }
+    .prep-guide-block p { margin: 0; color: #585e54; font-size: 11px; line-height: 1.7; }
+    .prep-safety-note { margin: 13px 0 0; padding: 10px 12px; border-left: 2px solid var(--yellow); color: #62685e; background: #faf8ef; font-size: 10px; line-height: 1.7; }
+    .shopping-intro { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin: 20px 0 14px; }
+    .shopping-intro h2 { margin-bottom: 5px; font-size: 18px; }
+    .shopping-intro p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .shopping-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+    .shopping-pack { min-width: 0; padding: 17px; border: 1px solid var(--line); border-radius: 4px; background: var(--white); }
+    .shopping-pack-head { display: flex; align-items: start; gap: 10px; margin-bottom: 8px; }
+    .shopping-pack-icon { display: grid; flex: 0 0 38px; width: 38px; height: 38px; place-items: center; border-radius: 3px; background: var(--green-light); font-size: 20px; }
+    .shopping-pack-tag { margin: 0 0 4px; color: var(--coral); font-size: 9px; font-weight: 700; }
+    .shopping-pack h3 { margin: 0; font-family: "Noto Serif SC", "Songti SC", serif; font-size: 15px; font-weight: 600; }
+    .shopping-description { min-height: 34px; margin: 0 0 12px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .shopping-label { margin: 12px 0 7px; color: var(--green); font-size: 10px; font-weight: 700; }
+    .shopping-items { display: flex; flex-wrap: wrap; gap: 6px; }
+    .shopping-item { padding: 5px 7px; border: 1px solid #dfe7dc; border-radius: 3px; color: #315540; background: #f4f7f1; font-size: 10px; }
+    .shopping-dishes { margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--line); }
+    .shopping-dishes summary { color: var(--muted); cursor: pointer; font-size: 10px; }
+    .shopping-dish-list { display: grid; gap: 7px; margin: 10px 0 0; padding: 0; list-style: none; }
+    .shopping-dish { display: flex; justify-content: space-between; gap: 8px; color: var(--ink); font-size: 10px; }
+    .shopping-dish span:last-child { flex: 0 0 auto; color: var(--muted); }
+    .shopping-use { width: 100%; margin-top: 13px; padding: 9px 10px; border: 1px solid var(--green); border-radius: 3px; color: #fff; background: var(--green); cursor: pointer; font-size: 11px; }
+    .shopping-use:hover { background: #1e4934; }
+    .results-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 23px 0 13px; }
+    .results-heading { display: flex; align-items: baseline; gap: 9px; }
+    .results-heading h2 { font-size: 19px; }
+    .results-heading span { color: var(--muted); font-size: 11px; }
+    .sort-label { color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .result-actions { display: flex; align-items: center; gap: 13px; }
+    .next-recipes { padding: 6px 8px; border: 1px solid #dfe0d5; border-radius: 3px; color: var(--green); background: var(--white); cursor: pointer; font-size: 11px; white-space: nowrap; }
+    .next-recipes:hover { border-color: var(--green); background: var(--green-light); }
+    .next-recipes[hidden] { display: none; }
+    .recipe-list { display: grid; gap: 10px; }
+    .recipe-card { overflow: hidden; border: 1px solid var(--line); border-radius: 4px; background: var(--white); transition: border-color .18s, transform .18s; }
+    .recipe-card:hover { border-color: #bbcaba; transform: translateY(-1px); }
+    .recipe-summary { display: grid; grid-template-columns: 50px minmax(0, 1fr) auto 20px; align-items: center; gap: 13px; width: 100%; padding: 15px 17px; border: 0; background: transparent; cursor: pointer; text-align: left; }
+    .dish-icon { display: grid; width: 48px; height: 48px; place-items: center; border-radius: 3px; background: #f3ebd9; font-size: 25px; }
+    .recipe-card:nth-child(3n + 2) .dish-icon { background: #e9efe7; }
+    .recipe-card:nth-child(3n) .dish-icon { background: #fae7df; }
+    .recipe-main { min-width: 0; }
+    .recipe-title-row { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-bottom: 5px; }
+    .recipe-title { font-family: "Noto Serif SC", "Songti SC", serif; font-size: 16px; font-weight: 600; letter-spacing: 0; }
+    .match-badge { padding: 3px 6px; border-radius: 2px; color: var(--green); background: var(--green-light); font-size: 9px; white-space: nowrap; }
+    .recipe-meta { display: flex; flex-wrap: wrap; gap: 10px; color: var(--muted); font-size: 11px; }
+    .recipe-meta span { white-space: nowrap; }
+    .recipe-meta .missing { color: #b46a47; }
+    .recipe-meta .nutrition { color: var(--green); }
+    .match-ring { display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid #d8e3d7; border-radius: 50%; color: var(--green); font-size: 10px; }
+    .chevron { color: #92968b; font-size: 16px; transition: transform .18s; }
+    .recipe-card[open] .chevron { transform: rotate(180deg); }
+    .recipe-details { padding: 0 19px 19px 80px; animation: reveal .2s ease-out; }
+    .detail-divider { height: 1px; margin-bottom: 15px; background: var(--line); }
+    .detail-grid { display: grid; grid-template-columns: minmax(130px, .85fr) minmax(0, 1.5fr); gap: 22px; }
+    .detail-grid h3 { margin-bottom: 9px; color: var(--green); font-size: 11px; font-weight: 700; }
+    .ingredient-lines, .steps { margin: 0; padding: 0; list-style: none; color: #585e54; font-size: 11px; line-height: 1.8; }
+    .ingredient-lines li { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; border-bottom: 1px dotted #e4e4d9; }
+    .ingredient-lines .have { color: var(--green); }
+    .ingredient-lines .need { color: #b46a47; }
+    .steps { counter-reset: step; }
+    .steps li { position: relative; margin-bottom: 8px; padding-left: 23px; counter-increment: step; }
+    .steps li::before { position: absolute; top: 1px; left: 0; display: grid; width: 16px; height: 16px; place-items: center; border-radius: 50%; color: var(--green); background: var(--green-light); content: counter(step); font-size: 9px; }
+    .nutrition-note { margin: 14px 0 0; padding: 10px 12px; border-left: 2px solid var(--yellow); color: #62685e; background: #faf8ef; font-size: 10px; line-height: 1.6; }
+    .empty-results { padding: 35px 24px; border: 1px dashed #d8d9ce; border-radius: 4px; color: var(--muted); text-align: center; }
+    .empty-results .empty-icon { margin-bottom: 9px; font-size: 25px; }
+    .empty-results strong { display: block; margin-bottom: 5px; color: var(--ink); font-family: "Noto Serif SC", "Songti SC", serif; font-size: 16px; font-weight: 600; }
+    .empty-results p { margin: 0; font-size: 12px; line-height: 1.6; }
+    .toast { position: fixed; right: 22px; bottom: 22px; z-index: 5; padding: 11px 16px; border-radius: 3px; color: #fff; background: #263b2f; box-shadow: 0 8px 22px #172b2030; font-size: 12px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: .2s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    footer { padding: 19px 0 27px; border-top: 1px solid #dfe0d5; color: #8b8e83; font-size: 10px; text-align: center; }
+    .weekly-intro { margin: 20px 0 14px; }
+    .weekly-intro h2 { margin-bottom: 5px; font-size: 18px; }
+    .weekly-intro p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .weekly-actions { display: flex; flex: 0 0 auto; gap: 8px; }
+    .weekly-generate { padding: 7px 12px; border: 1px solid var(--green); border-radius: 3px; color: #fff; background: var(--green); cursor: pointer; font-size: 11px; white-space: nowrap; }
+    .weekly-generate:hover { background: #1e4934; }
+    .weekly-generate:disabled { opacity: .55; cursor: wait; }
+    .weekly-reshuffle { padding: 7px 12px; border: 1px solid var(--green); border-radius: 3px; color: var(--green); background: var(--white); cursor: pointer; font-size: 11px; white-space: nowrap; }
+    .weekly-reshuffle:hover { background: var(--green-light); }
+    .weekly-reshuffle:disabled { opacity: .55; cursor: wait; }
+    .weekly-reshuffle[hidden] { display: none; }
+    .weekly-days { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); align-items: start; gap: 12px; }
+    .weekly-day { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 4px; background: var(--white); transition: opacity .2s; }
+    .weekly-days.stale .weekly-day { opacity: .55; }
+    .weekly-day-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+    .weekly-day-name { font-family: "Noto Serif SC", "Songti SC", serif; font-size: 17px; font-weight: 600; }
+    .weekly-day-date { color: var(--muted); font-size: 11px; }
+    .weekly-today { padding: 2px 6px; border-radius: 2px; color: #fff; background: var(--coral); font-size: 9px; }
+    .weekly-meal + .weekly-meal { margin-top: 12px; }
+    .weekly-meal-slot { margin: 0 0 6px; color: var(--green); font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+    .weekly-meal-empty { padding: 14px; border: 1px dashed #d8d9ce; border-radius: 4px; color: var(--muted); font-size: 11px; text-align: center; }
+    .weekly-meal .recipe-summary { grid-template-columns: 43px minmax(0, 1fr) 34px 12px; gap: 9px; padding: 10px 11px; }
+    .weekly-meal .dish-icon { width: 42px; height: 42px; font-size: 22px; }
+    .weekly-meal .recipe-title { font-size: 13px; }
+    .weekly-meal .recipe-meta { gap: 6px; font-size: 9px; }
+    .weekly-meal .match-ring { width: 32px; height: 32px; font-size: 9px; }
+    .weekly-meal .recipe-details { padding: 0 13px 14px; }
+    .weekly-shopping { margin-top: 22px; padding: 17px 19px; border: 1px solid var(--line); border-radius: 4px; background: var(--white); }
+    .weekly-shopping h3 { margin: 0 0 4px; font-family: "Noto Serif SC", "Songti SC", serif; font-size: 16px; font-weight: 600; }
+    .weekly-shopping-copy { margin: 0 0 12px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .weekly-shopping .shopping-use { width: auto; margin-top: 14px; padding: 9px 14px; }
+    @keyframes pop { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
+    @keyframes reveal { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 800px) {
+      .shell { width: min(100% - 36px, 620px); }
+      main { padding-top: 27px; }
+      .workspace { grid-template-columns: 1fr; gap: 20px; }
+      .pantry-head { padding: 18px 19px 15px; }
+      .pantry-body { padding: 15px 19px 18px; }
+      .pantry-foot { padding-right: 19px; padding-left: 19px; }
+      .result-banner { min-height: 152px; }
+      .shopping-grid { grid-template-columns: 1fr; }
+      .prep-guide-grid { grid-template-columns: 1fr; gap: 10px; }
+      .weekly-days { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 500px) {
+      .shell { width: calc(100% - 28px); }
+      .topbar { height: 66px; }
+      .install-button { padding: 8px 9px; font-size: 11px; }
+      main { padding-top: 23px; }
+      .intro { display: block; margin-bottom: 20px; }
+      h1 { font-size: 31px; }
+      .intro-copy { font-size: 12px; }
+      .date-stamp { display: none; }
+      .result-banner { min-height: 146px; padding: 19px; }
+      .banner-title { font-size: 20px; }
+      .recipe-summary { grid-template-columns: 43px minmax(0, 1fr) 34px 12px; gap: 9px; padding: 13px 11px; }
+      .dish-icon { width: 42px; height: 42px; font-size: 22px; }
+      .recipe-title { font-size: 14px; }
+      .recipe-meta { gap: 6px; font-size: 10px; }
+      .match-ring { width: 32px; height: 32px; font-size: 9px; }
+      .result-actions { align-items: end; flex-direction: column; gap: 5px; }
+      .results-toolbar { align-items: end; }
+      .recipe-details { padding: 0 13px 16px; }
+      .detail-grid { grid-template-columns: 1fr; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="今天吃什么首页">
+        <span class="brand-mark" aria-hidden="true">食</span>
+        <span>一餐灵感<small>COOK WITH WHAT YOU HAVE</small></span>
+      </a>
+        <button class="install-button" id="install-button" type="button"><span aria-hidden="true">↓</span> 安装到手机</button>
+    </header>
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">简单烹饪 · 轻负担日常</p>
+          <h1 id="page-title">吃得清爽，<em>也吃得满足。</em></h1>
+          <p class="intro-copy">固定菜谱不够时，会按手头食材即时组合家常做法；也能排一周食谱——连上本机服务时用菜谱数据库，离线时用内置菜谱。还能查买菜搭配和预处理，全部不联网下载新菜。</p>
+        </div>
+        <div class="date-stamp"><strong>●</strong> 按库存排一周食谱 + 即时组合</div>
+      </section>
+
+      <div class="workspace">
+        <section class="pantry" aria-labelledby="pantry-title">
+          <div class="pantry-head">
+            <p class="section-kicker">01 / 先看看手边有什么</p>
+            <h2 id="pantry-title">我的食材</h2>
+          </div>
+          <div class="pantry-body">
+            <form id="ingredient-form">
+              <div class="ingredient-input-wrap">
+                <input id="ingredient-input" type="text" autocomplete="off" placeholder="比如：鸡蛋、番茄、豆腐" aria-label="输入食材名称">
+                <button class="add-button" type="submit" aria-label="添加食材" title="添加食材">+</button>
+              </div>
+            </form>
+            <p class="input-hint">按回车添加，多个食材可以用逗号隔开</p>
+            <div class="chip-list" id="chip-list" aria-live="polite"></div>
+            <div class="suggestions">
+              <div class="suggestions-title"><span>常见食材，点一下添加</span><span>灵感备选</span></div>
+              <div class="suggestion-list" id="suggestion-list"></div>
+            </div>
+          </div>
+          <div class="pantry-foot">
+            <span class="pantry-count" id="pantry-count">还没有添加食材</span>
+            <button class="clear-button" id="clear-button" type="button">清空食材</button>
+          </div>
+        </section>
+
+        <section class="results" aria-labelledby="results-title">
+          <div class="result-banner">
+            <div class="banner-content">
+              <span class="banner-tag"><span>✦</span> 今日厨房提案</span>
+              <p class="banner-title">少油少盐，也能吃得有滋有味</p>
+              <p class="banner-copy">按库存排一周食谱、即时组合，也能查买菜搭配与预处理方法。</p>
+            </div>
+          </div>
+          <div class="mode-tabs" role="tablist" aria-label="选择菜谱推荐方式">
+            <button class="mode-tab" id="cook-tab" type="button" role="tab" aria-selected="true" aria-controls="cook-panel">用现有食材</button>
+            <button class="mode-tab" id="weekly-tab" type="button" role="tab" aria-selected="false" aria-controls="weekly-panel">一周食谱</button>
+            <button class="mode-tab" id="shopping-tab" type="button" role="tab" aria-selected="false" aria-controls="shopping-panel">帮我搭配买菜</button>
+            <button class="mode-tab" id="prep-tab" type="button" role="tab" aria-selected="false" aria-controls="prep-panel">查预处理</button>
+            <button class="mode-tab" id="howtocook-tab" type="button" role="tab" aria-selected="false" aria-controls="howtocook-panel">开源菜谱</button>
+          </div>
+          <div id="cook-panel" role="tabpanel" aria-labelledby="cook-tab">
+            <div class="results-toolbar">
+              <div class="results-heading"><h2 id="results-title">为你挑的菜</h2><span id="result-count">等你添加食材</span></div>
+              <div class="result-actions"><span class="sort-label">按食材匹配度排序</span><button class="next-recipes" id="next-recipes" type="button" hidden>再看几道 <span aria-hidden="true">→</span></button></div>
+            </div>
+            <div class="recipe-list" id="recipe-list" aria-live="polite"></div>
+          </div>
+          <div id="shopping-panel" role="tabpanel" aria-labelledby="shopping-tab" hidden>
+            <div class="shopping-intro">
+              <div><h2>不知道买些什么？</h2><p>选一组食材，看看能搭出哪些少油少盐的家常菜。</p></div>
+            </div>
+            <div class="shopping-grid" id="shopping-grid"></div>
+          </div>
+          <div id="prep-panel" role="tabpanel" aria-labelledby="prep-tab" hidden>
+            <div class="prep-intro"><h2>提前处理，缩短下厨时间</h2><p>搜索你手上的食材，查看切配、批量预处理和保存建议。</p></div>
+            <form class="prep-search" id="prep-search-form">
+              <input id="prep-search" type="search" autocomplete="off" placeholder="搜索食材，例如：茭白、平菇、排骨" aria-label="搜索食材预处理方法">
+              <button type="submit">查找</button>
+            </form>
+            <div class="prep-suggestions">
+              <div class="prep-suggestions-title">常用食材，点选查询</div>
+              <div class="prep-suggestion-list" id="prep-suggestion-list"></div>
+            </div>
+            <div class="prep-guides" id="prep-guides" aria-live="polite"></div>
+          </div>
+          <div id="howtocook-panel" role="tabpanel" aria-labelledby="howtocook-tab" hidden>
+            <div class="prep-intro"><h2>HowToCook 开源菜谱</h2><p>从社区菜谱中按现有食材找做法。</p></div>
+            <div class="howtocook-toolbar">
+              <span class="howtocook-status" id="howtocook-status" role="status">打开此页时在线读取最新菜名目录。</span>
+              <button class="howtocook-refresh" id="howtocook-refresh" type="button">更新目录</button>
+            </div>
+            <div class="recipe-list" id="howtocook-results" aria-live="polite"></div>
+            <button class="next-recipes" id="howtocook-more" type="button" hidden>再看几道 <span aria-hidden="true">→</span></button>
+            <p class="howtocook-credit">来源：<a href="https://github.com/Anduin2017/HowToCook" target="_blank" rel="noopener noreferrer">Anduin2017/HowToCook</a>（Unlicense）。展开菜谱时读取原文；原文用量与营养数据仅供参考。</p>
+          </div>
+          <div id="weekly-panel" role="tabpanel" aria-labelledby="weekly-tab" hidden>
+            <div class="weekly-intro"><h2>按现有食材，排出这一周的午餐和晚餐</h2><p>在左侧添加现有食材后点“生成一周食谱”：连接本机服务时由菜谱数据库（SQLite）排菜，连不上服务器时自动用内置菜谱离线排；生成后离线也能查看。</p></div>
+            <div class="howtocook-toolbar">
+              <span class="howtocook-status" id="weekly-status" role="status">先在左侧添加现有食材，再生成一周食谱。</span>
+              <div class="weekly-actions">
+                <button class="weekly-reshuffle" id="weekly-reshuffle" type="button" hidden>换一批</button>
+                <button class="weekly-generate" id="weekly-generate" type="button">生成一周食谱</button>
+              </div>
+            </div>
+            <div class="weekly-days" id="weekly-days" aria-live="polite"></div>
+            <div class="weekly-shopping" id="weekly-shopping" hidden>
+              <h3>本周需要补买</h3>
+              <p class="weekly-shopping-copy">下面食材在本周菜谱中出现但不在你的清单里，次数为需要它们的天数。买齐后点按钮加入食材清单，再重新生成会更贴合库存。</p>
+              <div class="shopping-items" id="weekly-shopping-list"></div>
+              <button class="shopping-use" id="weekly-shopping-use" type="button">已买齐，加入食材清单</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer>好好吃饭，也好好照顾自己。 · 食材仅保存在当前浏览器中</footer>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const pantryKey = "meal-inspiration-pantry-v1";
+    const howToCookReadmeUrl = "https://raw.githubusercontent.com/Anduin2017/HowToCook/master/README.md";
+    const howToCookRawBase = "https://raw.githubusercontent.com/Anduin2017/HowToCook/master/";
+    const suggestions = ["鸡蛋", "番茄", "土豆", "青椒", "豆腐", "鸡胸肉", "虾仁", "西兰花", "菠菜", "蘑菇", "香菇", "西葫芦", "黄瓜", "生菜", "玉米", "糙米", "燕麦", "牛肉", "冬瓜", "洋葱"];
+    const pantryStaples = new Set(["盐", "食用油", "水", "清水", "温水", "白糖", "糖", "生抽", "老抽", "料酒", "淀粉", "醋", "胡椒粉"]);
+    const aliases = { "西红柿": "番茄", "土豆": "土豆", "马铃薯": "土豆", "花菜": "菜花", "上海青": "青菜", "小白菜": "青菜", "卷心菜": "包菜", "圆白菜": "包菜", "平菇": "蘑菇", "青椒": "青椒", "尖椒": "青椒", "猪肉": "猪肉", "瘦猪肉": "猪肉", "猪里脊": "猪肉", "米饭": "米饭", "隔夜饭": "米饭" };
+    const recipes = [
+      { name: "番茄炒蛋", icon: "🍅", time: 15, level: "零失败", ingredients: [["番茄", "2个"], ["鸡蛋", "3个"], ["葱", "少许"], ["盐", "适量"], ["食用油", "适量"]], steps: ["番茄洗净切块，鸡蛋加一点盐打散。", "热锅倒油，蛋液炒至凝固后盛出。", "锅里再加少许油，番茄炒软出汁，倒回鸡蛋翻匀，加盐调味即可。"] },
+      { name: "青椒土豆丝", icon: "🥔", time: 20, level: "家常快手", ingredients: [["土豆", "1个"], ["青椒", "1个"], ["醋", "1勺"], ["盐", "适量"], ["食用油", "适量"]], steps: ["土豆去皮切细丝，放入清水中冲洗掉多余淀粉；青椒切丝。", "热锅倒油，先下土豆丝大火翻炒约2分钟。", "加入青椒丝和少许醋继续炒熟，用盐调味。"] },
+      { name: "香煎豆腐", icon: "◻️", time: 20, level: "外脆里嫩", ingredients: [["豆腐", "1块"], ["生抽", "1勺"], ["葱", "少许"], ["淀粉", "少许"], ["食用油", "适量"]], steps: ["豆腐切成厚片，用厨房纸轻轻吸去表面水分。", "平底锅热油，将豆腐煎至两面金黄。", "淋入生抽和少许水，轻轻翻匀焖1分钟，撒上葱花即可。"] },
+      { name: "蒜蓉西兰花", icon: "🥦", time: 15, level: "清爽简单", ingredients: [["西兰花", "1颗"], ["大蒜", "2瓣"], ["盐", "适量"], ["食用油", "适量"]], steps: ["西兰花切成小朵，洗净后沸水焯约1分钟，捞出沥干。", "热锅倒油，放入蒜末炒出香味。", "倒入西兰花大火翻炒，加盐调味即可。"] },
+      { name: "青椒肉丝", icon: "🫑", time: 20, level: "下饭首选", ingredients: [["青椒", "2个"], ["猪肉", "150克"], ["生抽", "1勺"], ["淀粉", "少许"], ["食用油", "适量"]], steps: ["猪肉切丝，加生抽和少许淀粉抓匀；青椒去籽切丝。", "热锅倒油，肉丝炒至变色后盛出。", "青椒炒至断生，倒回肉丝翻炒均匀，可按口味补一点生抽。"] },
+      { name: "土豆炖鸡", icon: "🍲", time: 35, level: "暖胃一锅", ingredients: [["土豆", "2个"], ["鸡胸肉", "200克"], ["胡萝卜", "半根"], ["生抽", "1勺"], ["水", "适量"]], steps: ["鸡肉切块，土豆和胡萝卜去皮切块。", "锅中少油，将鸡肉煎至表面变色，加入土豆和胡萝卜翻炒。", "加水没过食材，调入生抽，盖盖小火炖约20分钟至土豆软熟。"] },
+      { name: "鸡蛋炒饭", icon: "🍳", time: 12, level: "剩饭救星", ingredients: [["米饭", "1碗"], ["鸡蛋", "2个"], ["胡萝卜", "少许"], ["葱", "少许"], ["食用油", "适量"]], steps: ["鸡蛋打散，胡萝卜切小丁，米饭提前拨散。", "热锅倒油，炒熟鸡蛋后加入胡萝卜丁炒软。", "加入米饭炒至粒粒分开，按口味加盐，撒上葱花。"] },
+      { name: "香菇滑鸡", icon: "🍄", time: 25, level: "鲜香嫩滑", ingredients: [["鸡胸肉", "200克"], ["香菇", "4朵"], ["生抽", "1勺"], ["淀粉", "少许"], ["食用油", "适量"]], steps: ["鸡肉切片，加生抽和淀粉抓匀；香菇洗净切片。", "锅中少油，放入鸡肉滑炒至变色。", "加入香菇炒软，加少许水焖3分钟，确认鸡肉熟透后出锅。"] },
+      { name: "番茄豆腐汤", icon: "🥣", time: 18, level: "清淡暖胃", ingredients: [["番茄", "1个"], ["豆腐", "半块"], ["鸡蛋", "1个"], ["水", "适量"], ["盐", "适量"]], steps: ["番茄切块，豆腐切小块，鸡蛋打散。", "锅中少油炒软番茄，加水煮开后放入豆腐。", "煮3分钟后淋入蛋液，加盐调味，蛋花凝固即可关火。"] },
+      { name: "西兰花炒鸡蛋", icon: "🥚", time: 15, level: "轻盈家常", ingredients: [["西兰花", "半颗"], ["鸡蛋", "2个"], ["大蒜", "1瓣"], ["盐", "适量"], ["食用油", "适量"]], steps: ["西兰花切小朵，沸水焯1分钟；鸡蛋打散。", "热锅炒熟鸡蛋后盛出，锅中少油炒香蒜末。", "加入西兰花翻炒，倒回鸡蛋，加盐炒匀即可。"] },
+      { name: "土豆鸡蛋饼", icon: "🥞", time: 20, level: "早餐晚餐都行", ingredients: [["土豆", "1个"], ["鸡蛋", "2个"], ["面粉", "2勺"], ["盐", "适量"], ["食用油", "适量"]], steps: ["土豆擦成细丝，加入鸡蛋、面粉和少许盐拌匀。", "平底锅刷薄油，倒入土豆蛋糊摊成小饼。", "中小火煎至底面定型后翻面，两面金黄且土豆熟透即可。"] }
+    ];
+    const nutritionEstimates = {
+      "番茄炒蛋": [210, 13], "青椒土豆丝": [165, 4], "香煎豆腐": [190, 15], "蒜蓉西兰花": [95, 5],
+      "青椒肉丝": [245, 25], "土豆炖鸡": [330, 31], "鸡蛋炒饭": [360, 14], "香菇滑鸡": [260, 32],
+      "番茄豆腐汤": [165, 13], "西兰花炒鸡蛋": [185, 14], "土豆鸡蛋饼": [240, 12]
+    };
+    recipes.forEach((recipe) => {
+      const [kcal, protein] = nutritionEstimates[recipe.name];
+      Object.assign(recipe, { kcal, protein, oil: "5克", salt: "1克" });
+    });
+    function healthyRecipe(name, icon, time, kcal, protein, ingredients, steps, oil = "5克", salt = "1克") {
+      return { name, icon, time, level: "少油少盐", kcal, protein, oil, salt, ingredients, steps };
+    }
+    recipes.push(
+      healthyRecipe("西兰花炒鸡胸", "🥦", 18, 285, 38, [["鸡胸肉", "150克"], ["西兰花", "200克"], ["大蒜", "1瓣"], ["食用油", "5克"], ["盐", "1克"]], ["鸡胸肉切片，西兰花掰小朵焯水1分钟。", "锅中放少量油，鸡肉炒至完全熟透后盛出。", "蒜末炒香，加入西兰花和鸡肉快速翻匀，少量盐调味。"]),
+      healthyRecipe("香菇鸡胸蒸", "🍄", 25, 270, 36, [["鸡胸肉", "150克"], ["香菇", "4朵"], ["生抽", "半勺"], ["姜", "少许"]], ["鸡胸肉切片，香菇切片，加入姜丝和少量生抽拌匀。", "食材平铺在盘中，水开后上锅蒸约12分钟。", "确认鸡肉熟透，撒上葱花即可。"], "0克", "约1克"),
+      healthyRecipe("黑椒鸡胸彩椒", "🫑", 20, 295, 37, [["鸡胸肉", "150克"], ["彩椒", "150克"], ["黑胡椒", "少许"], ["食用油", "5克"]], ["鸡胸肉切块，彩椒切片。", "不粘锅放少量油，鸡肉炒至熟透。", "加入彩椒炒至断生，撒黑胡椒，少盐调味。"]),
+      healthyRecipe("黄瓜鸡丝", "🥒", 18, 230, 32, [["鸡胸肉", "130克"], ["黄瓜", "1根"], ["芝麻", "少许"], ["生抽", "半勺"]], ["鸡胸肉煮熟后放凉，顺纹理撕成细丝。", "黄瓜切丝，与鸡丝放入碗中。", "加入少量生抽、米醋和芝麻拌匀，不额外泼油。"], "0克", "约1克"),
+      healthyRecipe("番茄鸡胸豆腐", "🍅", 22, 330, 39, [["鸡胸肉", "100克"], ["番茄", "1个"], ["豆腐", "150克"], ["食用油", "5克"]], ["鸡胸肉切丁，番茄切块，豆腐切小块。", "少量油炒软番茄，加入鸡肉和清水煮至鸡肉熟透。", "放入豆腐小火煮5分钟，少盐调味。"]),
+      healthyRecipe("鸡胸肉生菜卷", "🥬", 20, 280, 35, [["鸡胸肉", "140克"], ["生菜", "4片"], ["胡萝卜", "半根"], ["原味酸奶", "1勺"]], ["鸡胸肉煮熟或煎熟后切条，胡萝卜切细丝。", "生菜洗净沥干，放上鸡肉和胡萝卜。", "淋少量原味酸奶，卷起食用。"], "3克", "约1克"),
+      healthyRecipe("虾仁西兰花", "🍤", 15, 235, 29, [["虾仁", "150克"], ["西兰花", "200克"], ["大蒜", "1瓣"], ["食用油", "5克"]], ["西兰花焯水1分钟，虾仁擦干水分。", "少量油炒香蒜末，加入虾仁炒至变色熟透。", "倒入西兰花翻匀，少盐调味即可。"]),
+      healthyRecipe("虾仁蒸蛋", "🥚", 20, 220, 25, [["虾仁", "80克"], ["鸡蛋", "2个"], ["温水", "约蛋液1.5倍"], ["生抽", "少许"]], ["鸡蛋打散，加入温水轻轻搅匀并过滤入碗。", "放入虾仁，盖盘或保鲜膜扎小孔。", "水开后中小火蒸约10分钟至蛋液凝固，少量生抽调味。"], "0克", "约1克"),
+      healthyRecipe("虾仁炒西葫芦", "🥒", 15, 210, 26, [["虾仁", "120克"], ["西葫芦", "1根"], ["食用油", "5克"], ["黑胡椒", "少许"]], ["西葫芦切薄片，虾仁擦干水分。", "不粘锅放少量油，将虾仁炒至变色熟透。", "加入西葫芦炒软，撒黑胡椒和少量盐。"]),
+      healthyRecipe("冬瓜虾仁汤", "🥣", 20, 175, 22, [["虾仁", "100克"], ["冬瓜", "250克"], ["姜", "少许"], ["盐", "1克"]], ["冬瓜去皮切薄片，虾仁洗净。", "锅中加水和姜片煮开，放入冬瓜煮至半透明。", "加入虾仁煮熟，少量盐调味即可。"], "0克", "1克"),
+      healthyRecipe("清蒸鳕鱼", "🐟", 18, 205, 34, [["鳕鱼", "160克"], ["姜", "少许"], ["葱", "少许"], ["生抽", "半勺"]], ["鳕鱼解冻后擦干，放上姜片。", "水开后上锅蒸8至10分钟，按鱼块厚度调整至熟透。", "倒掉盘中多余汁水，点少量生抽并撒葱花。"], "0克", "约1克"),
+      healthyRecipe("番茄炖鳕鱼", "🍅", 22, 245, 33, [["鳕鱼", "150克"], ["番茄", "1个"], ["洋葱", "半个"], ["食用油", "5克"]], ["鳕鱼切块，番茄和洋葱切丁。", "少量油炒软洋葱和番茄，加少许水煮出汁。", "放入鳕鱼小火煮至鱼肉熟透，少盐调味。"]),
+      healthyRecipe("清蒸鲈鱼片", "🐟", 18, 215, 32, [["鲈鱼片", "160克"], ["姜", "少许"], ["葱", "少许"], ["生抽", "半勺"]], ["鲈鱼片擦干，铺上姜丝。", "水开后蒸约7分钟至鱼肉不透明、中心熟透。", "撒葱丝，淋少量生抽即可。"], "0克", "约1克"),
+      healthyRecipe("芦笋煎三文鱼", "🐟", 18, 390, 32, [["三文鱼", "120克"], ["芦笋", "120克"], ["柠檬", "2片"], ["黑胡椒", "少许"]], ["三文鱼擦干，芦笋切去老根。", "不粘锅不额外加油，三文鱼两面煎熟；芦笋同锅煎软。", "挤少许柠檬汁和黑胡椒调味。"], "0克（鱼脂）", "约0.5克"),
+      healthyRecipe("豆腐蒸蛋", "◻️", 20, 230, 20, [["嫩豆腐", "150克"], ["鸡蛋", "1个"], ["温水", "约蛋液1倍"], ["葱", "少许"]], ["嫩豆腐切小块放入碗底，鸡蛋加温水打匀。", "蛋液缓缓倒在豆腐上，盖盘上锅蒸约12分钟。", "蛋液凝固后撒葱花，按需加极少量生抽。"], "0克", "约0.5克"),
+      healthyRecipe("青菜豆腐汤", "🥣", 18, 185, 15, [["豆腐", "150克"], ["青菜", "150克"], ["香菇", "2朵"], ["盐", "1克"]], ["豆腐切块，青菜和香菇洗净切好。", "锅中加水煮开，先放香菇和豆腐煮5分钟。", "加入青菜烫熟，少量盐调味。"], "0克", "1克"),
+      healthyRecipe("香菇炖豆腐", "🍄", 22, 240, 20, [["豆腐", "180克"], ["香菇", "4朵"], ["小白菜", "100克"], ["生抽", "半勺"]], ["豆腐切块，香菇切片，小白菜洗净。", "锅中加少量水和生抽，放入豆腐、香菇焖煮8分钟。", "加入小白菜煮软，少盐调味。"], "3克", "约1克"),
+      healthyRecipe("西兰花豆腐", "🥦", 18, 235, 19, [["豆腐", "150克"], ["西兰花", "180克"], ["大蒜", "1瓣"], ["食用油", "5克"]], ["西兰花焯水1分钟，豆腐切块。", "少量油煎豆腐至表面微黄，加入蒜末。", "放入西兰花和少量清水焖2分钟，少盐调味。"]),
+      healthyRecipe("凉拌豆腐菠菜", "🥗", 15, 205, 18, [["北豆腐", "150克"], ["菠菜", "150克"], ["芝麻", "少许"], ["生抽", "半勺"]], ["菠菜焯水后挤去多余水分，豆腐切块。", "豆腐和菠菜放入盘中，撒少许芝麻。", "以少量生抽、米醋和蒜末调味，不另加油。"], "0克", "约1克"),
+      healthyRecipe("金针菇豆腐汤", "🍲", 18, 180, 16, [["金针菇", "100克"], ["豆腐", "150克"], ["番茄", "半个"], ["盐", "1克"]], ["番茄切块，豆腐切丁，金针菇去根洗净。", "锅中加水煮开，放入番茄和豆腐煮5分钟。", "加入金针菇再煮3分钟，少量盐调味。"], "0克", "1克"),
+      healthyRecipe("少油麻婆豆腐", "🌶️", 22, 285, 22, [["豆腐", "200克"], ["瘦牛肉末", "50克"], ["豆瓣酱", "半勺"], ["淀粉", "少许"]], ["豆腐切块焯水；牛肉末选瘦肉。", "不粘锅用少量油炒散牛肉末，加入半勺豆瓣酱和清水。", "放入豆腐小火煮5分钟，少量水淀粉勾薄芡。"], "5克", "约1克（含豆瓣酱）"),
+      healthyRecipe("瘦牛肉西兰花", "🥩", 18, 310, 34, [["瘦牛肉", "120克"], ["西兰花", "180克"], ["生抽", "半勺"], ["食用油", "5克"]], ["牛肉逆纹切薄片，西兰花焯水1分钟。", "少量油快速炒牛肉至刚熟后盛出。", "西兰花回锅，加入牛肉和少量生抽快速翻匀。"]),
+      healthyRecipe("彩椒牛肉丝", "🫑", 20, 320, 32, [["瘦牛肉", "120克"], ["彩椒", "150克"], ["黑胡椒", "少许"], ["食用油", "5克"]], ["牛肉切细丝，彩椒切条。", "少量油将牛肉炒至熟透后盛出。", "彩椒炒至断生，加入牛肉和黑胡椒，少盐调味。"]),
+      healthyRecipe("番茄炖牛肉", "🍲", 45, 350, 31, [["瘦牛肉", "130克"], ["番茄", "2个"], ["洋葱", "半个"], ["胡萝卜", "半根"]], ["牛肉切块焯水，番茄、洋葱和胡萝卜切块。", "所有食材加水放入锅中，小火炖至牛肉软熟。", "用番茄本身的酸甜调味，尝后再决定是否加盐。"], "3克", "约0.5克"),
+      healthyRecipe("瘦肉蒸冬瓜", "🥣", 25, 225, 25, [["瘦猪肉", "100克"], ["冬瓜", "200克"], ["姜", "少许"], ["生抽", "半勺"]], ["冬瓜切片铺在盘底，瘦肉切薄片放在上面。", "加姜丝和少量生抽，水开后蒸约12分钟至肉熟。", "利用食材蒸出的汤汁拌饭或直接食用。"], "0克", "约1克"),
+      healthyRecipe("猪里脊炒蘑菇", "🍄", 18, 285, 31, [["猪里脊", "120克"], ["蘑菇", "150克"], ["食用油", "5克"], ["黑胡椒", "少许"]], ["里脊切片，蘑菇切片。", "少量油炒熟里脊后盛出。", "蘑菇炒软出汁，倒回里脊，加黑胡椒和少量盐。"]),
+      healthyRecipe("玉米鸡胸沙拉", "🌽", 15, 320, 34, [["鸡胸肉", "120克"], ["玉米粒", "80克"], ["生菜", "100克"], ["原味酸奶", "1勺"]], ["鸡胸肉煮熟放凉后切片，玉米粒煮熟。", "生菜洗净沥干，与鸡肉和玉米装盘。", "以原味酸奶和黑胡椒代替高热量沙拉酱。"], "0克", "约0.5克"),
+      healthyRecipe("全麦鸡蛋蔬菜饼", "🥞", 20, 295, 17, [["全麦面粉", "40克"], ["鸡蛋", "1个"], ["菠菜", "50克"], ["胡萝卜", "少许"]], ["全麦面粉加水调成稀糊，拌入鸡蛋和切碎的蔬菜。", "不粘锅刷薄薄一层油，倒入面糊摊平。", "小火煎至两面熟透，搭配无糖豆浆或酸奶。"], "3克", "约0.5克"),
+      healthyRecipe("燕麦鸡蛋饼", "🥞", 15, 270, 16, [["燕麦片", "40克"], ["鸡蛋", "1个"], ["牛奶", "50毫升"], ["菠菜", "少许"]], ["燕麦片、鸡蛋和牛奶搅拌，加入切碎的菠菜。", "静置3分钟让燕麦吸水。", "不粘锅小火摊成饼，两面煎熟即可。"], "3克", "约0.5克"),
+      healthyRecipe("菠菜鸡蛋汤", "🥣", 12, 150, 12, [["菠菜", "150克"], ["鸡蛋", "1个"], ["香菇", "2朵"], ["盐", "1克"]], ["菠菜洗净切段，香菇切片，鸡蛋打散。", "清水煮开后下香菇煮3分钟，放入菠菜。", "淋入蛋液至凝固，少量盐调味。"], "0克", "1克"),
+      healthyRecipe("番茄菌菇蒸蛋", "🍅", 20, 205, 15, [["鸡蛋", "2个"], ["番茄", "半个"], ["蘑菇", "50克"], ["温水", "约蛋液1倍"]], ["鸡蛋加温水打匀，过滤后倒入碗中。", "放入切小块的番茄和蘑菇，盖盘防止水滴落入。", "水开后中小火蒸约12分钟至完全凝固。"], "0克", "约0.5克"),
+      healthyRecipe("黄瓜鸡蛋虾仁沙拉", "🥗", 18, 285, 28, [["虾仁", "80克"], ["鸡蛋", "1个"], ["黄瓜", "半根"], ["生菜", "80克"]], ["鸡蛋煮熟切块，虾仁煮熟后放凉。", "黄瓜切片，生菜洗净沥干，放入碗中。", "加入虾仁和鸡蛋，以柠檬汁、黑胡椒和少量酸奶调味。"], "0克", "约0.5克"),
+      healthyRecipe("紫菜豆腐虾皮汤", "🥣", 12, 150, 14, [["嫩豆腐", "100克"], ["紫菜", "少许"], ["虾皮", "3克"], ["葱", "少许"]], ["豆腐切丁，紫菜和虾皮快速冲洗。", "清水煮开后放入豆腐煮3分钟，再加入紫菜。", "虾皮少量使用以控制钠，关火后撒葱花。"], "0克", "约0.5克（虾皮含钠）"),
+      healthyRecipe("糙米鸡肉蔬菜饭", "🍚", 25, 420, 34, [["糙米饭", "150克"], ["鸡胸肉", "100克"], ["西兰花", "80克"], ["胡萝卜", "半根"]], ["糙米提前煮熟；鸡胸肉切丁，蔬菜切小块。", "鸡肉用少量油炒熟，加入蔬菜和少许水焖软。", "铺在糙米饭上，少量生抽调味。"], "5克", "约1克"),
+      healthyRecipe("糙米虾仁碗", "🍤", 20, 390, 29, [["糙米饭", "150克"], ["虾仁", "120克"], ["黄瓜", "半根"], ["玉米粒", "50克"]], ["糙米饭提前准备；虾仁煮熟或用不粘锅少油煎熟。", "黄瓜切丁，玉米粒煮熟。", "食材分开放在饭上，以柠檬汁和黑胡椒调味。"], "3克", "约0.5克"),
+      healthyRecipe("鸡蛋金针菇汤", "🍲", 15, 170, 12, [["鸡蛋", "1个"], ["金针菇", "100克"], ["番茄", "半个"], ["盐", "1克"]], ["金针菇去根，番茄切小块，鸡蛋打散。", "锅中加水煮开，加入番茄和金针菇煮熟。", "淋入蛋液，少量盐调味。"], "0克", "1克"),
+      healthyRecipe("鸡胸肉燕麦粥", "🥣", 25, 330, 31, [["燕麦片", "40克"], ["鸡胸肉", "100克"], ["香菇", "2朵"], ["青菜", "少许"]], ["鸡胸肉切小丁，香菇切片。", "锅中加水煮开，放入燕麦和香菇，小火煮至浓稠。", "加入鸡肉煮至熟透，最后放青菜烫熟，少盐调味。"], "0克", "约0.8克"),
+      healthyRecipe("清炒西兰花蘑菇", "🥦", 15, 155, 8, [["西兰花", "150克"], ["蘑菇", "100克"], ["大蒜", "1瓣"], ["食用油", "5克"]], ["西兰花焯水1分钟，蘑菇切片。", "少量油炒香蒜末，加入蘑菇炒软。", "放入西兰花和少许清水翻匀，少盐调味。"]),
+      healthyRecipe("彩椒豆腐炒蛋", "🫑", 18, 280, 20, [["豆腐", "100克"], ["鸡蛋", "1个"], ["彩椒", "100克"], ["食用油", "5克"]], ["豆腐切丁，彩椒切小块，鸡蛋打散。", "少量油炒熟鸡蛋后盛出，豆腐煎至微黄。", "加入彩椒炒软，倒回鸡蛋，少盐调味。"]),
+      healthyRecipe("番茄鹰嘴豆炖菜", "🍲", 25, 310, 15, [["鹰嘴豆", "100克（熟）"], ["番茄", "1个"], ["菠菜", "50克"], ["洋葱", "半个"]], ["洋葱和番茄切丁，熟鹰嘴豆冲洗沥干。", "锅中加少许水煮软洋葱和番茄，加入鹰嘴豆焖10分钟。", "放入菠菜烫熟，用黑胡椒和少量盐调味。"], "3克", "约0.5克"),
+      healthyRecipe("凉拌鸡胸紫甘蓝", "🥗", 20, 250, 33, [["鸡胸肉", "130克"], ["紫甘蓝", "100克"], ["黄瓜", "半根"], ["米醋", "1勺"]], ["鸡胸肉煮熟放凉后撕成丝。", "紫甘蓝切细丝，黄瓜切丝，可用开水快速焯软后沥干。", "加入米醋、少量生抽和蒜末拌匀，不额外加油。"], "0克", "约0.8克"),
+      healthyRecipe("洋葱鸡肉菌菇", "🍄", 20, 290, 34, [["鸡胸肉", "130克"], ["洋葱", "半个"], ["香菇", "3朵"], ["食用油", "5克"]], ["鸡胸肉切片，洋葱和香菇切好。", "少量油炒熟鸡肉后盛出。", "洋葱和香菇炒软，倒回鸡肉，加少量水焖熟并少盐调味。"])
+    );
+    recipes.push(
+      healthyRecipe("青柠鸡肉藜麦碗", "🥗", 25, 390, 36, [["鸡胸肉", "120克"], ["藜麦", "100克（熟）"], ["黄瓜", "半根"], ["青柠", "半个"]], ["藜麦提前煮熟，鸡胸肉用黑胡椒腌10分钟。", "不粘锅少油煎熟鸡胸肉，静置后切片。", "与藜麦、黄瓜丁装碗，挤青柠汁调味。"], "3克", "约0.5克"),
+      healthyRecipe("芹菜鸡胸炒木耳", "🥬", 18, 245, 32, [["鸡胸肉", "120克"], ["芹菜", "100克"], ["木耳", "少许（泡发）"], ["食用油", "5克"]], ["木耳提前泡发并充分煮熟，芹菜切段，鸡胸肉切片。", "少量油先将鸡肉炒至熟透后盛出。", "芹菜和木耳炒熟，倒回鸡肉翻匀，少盐调味。"]),
+      healthyRecipe("南瓜鸡胸蒸饭", "🍚", 30, 405, 32, [["鸡胸肉", "100克"], ["南瓜", "100克"], ["糙米饭", "150克"], ["香菇", "2朵"]], ["鸡胸肉和南瓜切丁，香菇切片。", "糙米饭放入碗底，铺上其余食材，淋少量生抽和清水。", "上锅蒸约15分钟至鸡肉熟透、南瓜软糯。"], "3克", "约0.8克"),
+      healthyRecipe("香煎去皮鸡腿排", "🍗", 22, 330, 32, [["鸡腿肉", "150克（去皮）"], ["芦笋", "100克"], ["柠檬", "2片"], ["黑胡椒", "少许"]], ["鸡腿肉去皮擦干，用黑胡椒和柠檬汁腌10分钟。", "不粘锅中小火煎至两面金黄、中心熟透。", "同锅煎软芦笋，搭配鸡腿肉食用。"], "3克", "约0.5克"),
+      healthyRecipe("鸡肉豆腐丸子", "🍲", 25, 300, 34, [["鸡胸肉", "100克"], ["豆腐", "100克"], ["鸡蛋", "半个"], ["香菇", "2朵"]], ["鸡胸肉剁碎，豆腐压去多余水分，香菇切末。", "与鸡蛋和少许淀粉拌匀，团成小丸子。", "水开后蒸约12分钟至中心熟透，或放入清汤煮熟。"], "0克", "约0.8克"),
+      healthyRecipe("鸡肉蔬菜汤", "🥣", 25, 290, 30, [["鸡胸肉", "100克"], ["胡萝卜", "半根"], ["玉米", "半根"], ["娃娃菜", "100克"]], ["鸡胸肉切块，胡萝卜和玉米切段。", "清水煮开后放入鸡肉、胡萝卜和玉米，小火煮熟。", "加入娃娃菜煮软，少盐调味。"], "0克", "约0.8克"),
+      healthyRecipe("蒜香虾仁芦笋", "🍤", 15, 225, 28, [["虾仁", "130克"], ["芦笋", "150克"], ["大蒜", "1瓣"], ["食用油", "5克"]], ["芦笋切段焯水，虾仁擦干水分。", "少量油炒香蒜末，加入虾仁炒至熟透。", "放入芦笋翻炒，少量盐和黑胡椒调味。"]),
+      healthyRecipe("虾仁豆腐煲", "🍲", 20, 260, 29, [["虾仁", "100克"], ["豆腐", "150克"], ["白菜", "100克"], ["香菇", "2朵"]], ["豆腐切块，白菜切段，香菇切片。", "锅中加少许水，放入白菜和香菇煮软。", "加入豆腐和虾仁煮至虾仁熟透，少盐调味。"], "0克", "约0.8克"),
+      healthyRecipe("番茄虾仁荞麦面", "🍜", 20, 370, 29, [["虾仁", "100克"], ["番茄", "1个"], ["荞麦面", "60克（干）"], ["菠菜", "少许"]], ["荞麦面按包装说明煮熟，番茄切块。", "少量油炒软番茄，加少许水煮成汤底。", "加入虾仁煮熟，再放荞麦面和菠菜烫熟。"], "3克", "约1克"),
+      healthyRecipe("清蒸鲳鱼", "🐟", 22, 260, 34, [["鲳鱼", "160克"], ["姜", "少许"], ["葱", "少许"], ["生抽", "半勺"]], ["鲳鱼处理干净，在鱼身划浅口并放上姜片。", "水开后上锅蒸约10分钟，按鱼的大小调整至熟透。", "倒掉盘中多余汁水，淋少量生抽并撒葱花。"], "0克", "约1克"),
+      healthyRecipe("香煎豆腐茄子", "🍆", 22, 260, 17, [["豆腐", "150克"], ["茄子", "150克"], ["彩椒", "半个"], ["食用油", "5克"]], ["茄子切条，豆腐切块，彩椒切丝。", "不粘锅少量油煎豆腐至微黄后盛出。", "茄子加少许水焖软，放回豆腐和彩椒翻匀。"], "5克", "约0.8克"),
+      healthyRecipe("蒸茄子瘦肉末", "🍆", 25, 280, 25, [["茄子", "200克"], ["瘦猪肉", "80克"], ["大蒜", "1瓣"], ["生抽", "半勺"]], ["茄子切长条，水开后蒸约10分钟至软。", "瘦猪肉剁末，用不粘锅少量油炒熟。", "肉末铺在茄子上，淋少量生抽和蒸出的汁水。"], "3克", "约1克"),
+      healthyRecipe("毛豆炒鸡蛋", "🥚", 18, 265, 20, [["毛豆", "100克（熟）"], ["鸡蛋", "2个"], ["胡萝卜", "少许"], ["食用油", "5克"]], ["毛豆煮熟沥干，鸡蛋打散，胡萝卜切小丁。", "少量油炒熟鸡蛋后盛出，胡萝卜丁炒软。", "加入毛豆和鸡蛋翻匀，少盐调味。"]),
+      healthyRecipe("荷兰豆炒鸡胸", "🥬", 18, 255, 33, [["鸡胸肉", "120克"], ["荷兰豆", "120克"], ["胡萝卜", "少许"], ["食用油", "5克"]], ["鸡胸肉切片，荷兰豆去筋，胡萝卜切片。", "少量油将鸡胸肉炒至熟透后盛出。", "荷兰豆和胡萝卜炒熟，倒回鸡肉翻匀。"]),
+      healthyRecipe("凉拌木耳黄瓜", "🥗", 15, 95, 4, [["木耳", "少许（泡发）"], ["黄瓜", "1根"], ["香菜", "少许"], ["米醋", "1勺"]], ["木耳泡发后彻底煮熟，沥干放凉。", "黄瓜拍松切块，香菜切段。", "加入米醋、蒜末和少量生抽拌匀，不额外泼油。"], "0克", "约0.5克"),
+      healthyRecipe("鸡蛋豆皮卷", "🌯", 18, 285, 22, [["鸡蛋", "2个"], ["豆皮", "1张"], ["生菜", "2片"], ["胡萝卜", "少许"]], ["豆皮焯水后沥干，鸡蛋摊成薄蛋皮。", "胡萝卜切细丝，生菜洗净。", "用豆皮和蛋皮包入蔬菜，切段后搭配少量醋汁。"], "3克", "约0.8克"),
+      healthyRecipe("牛肉芹菜炒", "🥩", 18, 295, 31, [["瘦牛肉", "120克"], ["芹菜", "120克"], ["胡萝卜", "少许"], ["食用油", "5克"]], ["瘦牛肉逆纹切片，芹菜切段。", "少量油将牛肉炒至熟透后盛出。", "芹菜和胡萝卜炒熟，放回牛肉翻匀，少盐调味。"]),
+      healthyRecipe("牛肉冬瓜汤", "🥣", 30, 280, 29, [["瘦牛肉", "100克"], ["冬瓜", "200克"], ["姜", "少许"], ["葱", "少许"]], ["瘦牛肉切薄片，冬瓜去皮切片。", "清水煮开后放入牛肉和姜片，撇去浮沫。", "牛肉熟后加入冬瓜煮至透明，少盐调味。"], "0克", "约0.8克"),
+      healthyRecipe("番茄牛腩炖萝卜", "🍲", 55, 390, 30, [["牛腩", "120克（去明显肥油）"], ["番茄", "1个"], ["白萝卜", "150克"], ["洋葱", "少许"]], ["牛腩切块焯水，撇去浮油；番茄、白萝卜切块。", "所有食材加水小火炖至牛腩软烂。", "利用番茄提味，少量盐调味即可。"], "0克（撇去浮油）", "约0.8克"),
+      healthyRecipe("清炖牛肉萝卜", "🥣", 55, 330, 32, [["瘦牛肉", "120克"], ["白萝卜", "200克"], ["胡萝卜", "半根"], ["姜", "少许"]], ["牛肉切块焯水，白萝卜和胡萝卜切块。", "加清水和姜片小火炖至牛肉软熟。", "加入萝卜再煮至软，少盐调味。"], "0克", "约0.8克"),
+      healthyRecipe("黑椒牛肉饭", "🍚", 22, 430, 33, [["瘦牛肉", "100克"], ["糙米饭", "150克"], ["彩椒", "80克"], ["黑胡椒", "少许"]], ["糙米饭提前煮熟，牛肉和彩椒切丁。", "不粘锅少量油炒熟牛肉，加入彩椒炒至断生。", "铺在糙米饭上，撒黑胡椒并少盐调味。"], "5克", "约0.8克"),
+      healthyRecipe("猪里脊蒸蛋", "🥚", 20, 260, 28, [["猪里脊", "70克"], ["鸡蛋", "1个"], ["香菇", "2朵"], ["温水", "约蛋液1倍"]], ["里脊切薄片，香菇切片，鸡蛋加温水打匀。", "蛋液和食材放入碗中，盖盘防止水滴落入。", "水开后中小火蒸约12分钟，确保肉片熟透。"], "0克", "约0.8克"),
+      healthyRecipe("豆腐豆皮蔬菜汤", "🥣", 18, 230, 20, [["豆腐", "100克"], ["豆皮", "50克"], ["菠菜", "100克"], ["香菇", "2朵"]], ["豆腐切块，豆皮切条，菠菜和香菇洗净。", "清水煮开后放入豆腐、豆皮和香菇煮5分钟。", "加入菠菜烫熟，少量盐调味。"], "0克", "约0.8克"),
+      healthyRecipe("南瓜燕麦粥鸡蛋", "🥣", 20, 315, 17, [["南瓜", "120克"], ["燕麦片", "35克"], ["鸡蛋", "1个"], ["牛奶", "100毫升"]], ["南瓜去皮切小块，鸡蛋煮熟或蒸熟。", "南瓜加水煮软，加入燕麦片煮至浓稠。", "关火后拌入牛奶，搭配鸡蛋食用。"], "0克", "约0.5克"),
+      healthyRecipe("鲜虾蒸南瓜蛋", "🍤", 22, 255, 26, [["虾仁", "80克"], ["南瓜", "100克"], ["鸡蛋", "1个"], ["温水", "少许"]], ["南瓜切薄片铺盘底，虾仁洗净擦干。", "鸡蛋加温水打匀，倒在南瓜和虾仁上。", "水开后蒸约12分钟至蛋液凝固、虾仁熟透。"], "0克", "约0.5克"),
+      healthyRecipe("鳕鱼菌菇蒸", "🐟", 22, 235, 35, [["鳕鱼", "150克"], ["蘑菇", "80克"], ["金针菇", "50克"], ["姜", "少许"]], ["蘑菇切片，金针菇去根洗净，鳕鱼擦干。", "菌菇铺盘底，放上鳕鱼和姜丝。", "水开后蒸约10分钟，确认鱼肉中心熟透后少盐调味。"], "0克", "约0.8克"),
+      healthyRecipe("西葫芦鸡蛋饼", "🥞", 18, 245, 14, [["西葫芦", "半根"], ["鸡蛋", "1个"], ["燕麦片", "25克"], ["全麦面粉", "15克"]], ["西葫芦擦丝，稍微挤去水分。", "拌入鸡蛋、燕麦片和全麦面粉，静置5分钟。", "不粘锅薄刷油，小火煎成小饼至两面熟透。"], "3克", "约0.5克"),
+      healthyRecipe("菠菜豆腐鸡蛋卷", "🥬", 20, 265, 22, [["菠菜", "80克"], ["豆腐", "80克"], ["鸡蛋", "2个"], ["食用油", "3克"]], ["菠菜焯水切碎，豆腐压碎并挤去多余水分。", "鸡蛋打散，加入菠菜和豆腐拌匀。", "不粘锅摊成蛋饼，卷起后切段并确认中心熟透。"], "3克", "约0.8克"),
+      healthyRecipe("西芹炒虾仁", "🍤", 16, 220, 27, [["虾仁", "120克"], ["西芹", "120克"], ["胡萝卜", "少许"], ["食用油", "5克"]], ["西芹切段，胡萝卜切薄片，虾仁擦干。", "少量油将虾仁炒至熟透后盛出。", "西芹和胡萝卜炒熟，倒回虾仁快速翻匀，少盐调味。"]),
+      healthyRecipe("荞麦面鸡丝", "🍜", 20, 380, 32, [["荞麦面", "60克（干）"], ["鸡胸肉", "100克"], ["黄瓜", "半根"], ["胡萝卜", "少许"]], ["荞麦面按包装说明煮熟，鸡胸肉煮熟后撕成丝。", "黄瓜和胡萝卜切细丝，可用开水烫软。", "面条沥干后放入鸡丝和蔬菜，以醋和少量生抽拌匀。"], "0克", "约1克"),
+      healthyRecipe("凉拌毛豆豆腐", "🥗", 15, 240, 21, [["毛豆", "80克（熟）"], ["豆腐", "100克"], ["黄瓜", "半根"], ["米醋", "1勺"]], ["毛豆煮熟沥干，豆腐切丁，黄瓜切小块。", "食材放入碗中，加入蒜末和米醋。", "少量生抽调味，拌匀后冷藏片刻更清爽。"], "0克", "约0.8克"),
+      healthyRecipe("清炒包菜鸡胸", "🥬", 18, 250, 32, [["包菜", "180克"], ["鸡胸肉", "110克"], ["胡萝卜", "少许"], ["食用油", "5克"]], ["包菜切丝，鸡胸肉切片，胡萝卜切丝。", "少量油将鸡胸肉炒至熟透后盛出。", "包菜和胡萝卜炒软，倒回鸡肉翻匀并少盐调味。"])
+    );
+    recipes.push(
+      healthyRecipe("茭白炒肉片", "🥢", 20, 290, 27, [["茭白", "150克"], ["猪肉", "100克（选瘦肉）"], ["青椒", "半个"], ["食用油", "5克"]], ["茭白去壳切片，瘦猪肉切薄片，青椒切丝。", "少量油先将肉片炒至完全熟透后盛出。", "茭白和青椒炒软，倒回肉片翻匀，少量生抽调味。"]),
+      healthyRecipe("蒜黄炒蛋", "🥚", 15, 225, 15, [["蒜黄", "120克"], ["鸡蛋", "2个"], ["食用油", "5克"], ["盐", "1克"]], ["蒜黄洗净沥干，切成段；鸡蛋打散。", "少量油炒熟蛋液后盛出。", "蒜黄炒至刚刚变软，倒回鸡蛋翻匀，少盐调味。"]),
+      healthyRecipe("菜花番茄豆腐煲", "🍲", 25, 285, 21, [["菜花", "150克"], ["番茄", "1个"], ["豆腐", "120克"], ["食用油", "5克"]], ["菜花掰小朵焯水1分钟，番茄切块，豆腐切块。", "少量油炒软番茄，加半碗水煮出汁。", "加入菜花和豆腐焖煮6分钟，少盐调味。"]),
+      healthyRecipe("丝瓜平菇炒蛋", "🥒", 18, 250, 17, [["丝瓜", "150克"], ["蘑菇", "80克（平菇）"], ["鸡蛋", "1个"], ["食用油", "5克"]], ["丝瓜去皮切块，平菇撕成小片，鸡蛋打散。", "少量油炒熟鸡蛋后盛出，再放平菇炒软。", "加入丝瓜炒熟，倒回鸡蛋翻匀，少盐调味。"]),
+      healthyRecipe("排骨炖茭白", "🍲", 65, 430, 28, [["排骨", "150克"], ["茭白", "150克"], ["姜", "少许"], ["盐", "少量"]], ["排骨冷水下锅焯2至3分钟，捞出冲净浮沫。", "加入清水和姜片，小火炖约50分钟；撇去表面浮油。", "加入茭白再炖10至15分钟至排骨熟透，最后少量盐调味。"], "0克", "约0.8克"),
+      healthyRecipe("上海青炒平菇", "🥬", 15, 145, 8, [["青菜", "180克（上海青）"], ["蘑菇", "100克（平菇）"], ["大蒜", "1瓣"], ["食用油", "5克"]], ["上海青拆叶洗净沥干，平菇撕成小片。", "少量油炒香蒜末，先放平菇炒软。", "加入上海青大火炒至断生，少量盐调味。"]),
+      healthyRecipe("西葫芦蒜黄肉片", "🥢", 20, 285, 26, [["西葫芦", "120克"], ["蒜黄", "80克"], ["猪肉", "100克（选瘦肉）"], ["食用油", "5克"]], ["西葫芦切片，蒜黄切段，瘦猪肉切片。", "少量油先把肉片炒至完全熟透后盛出。", "西葫芦炒软，加入蒜黄和肉片快速翻匀，少盐调味。"]),
+      healthyRecipe("黄瓜豆腐鸡蛋拌", "🥗", 15, 245, 19, [["黄瓜", "半根"], ["豆腐", "100克"], ["鸡蛋", "1个"], ["米醋", "1勺"]], ["鸡蛋煮熟切块；豆腐焯水1分钟后放凉，黄瓜切片。", "豆腐、鸡蛋和黄瓜放入碗中。", "加米醋、蒜末和少量生抽拌匀，不额外泼油。"], "0克", "约0.8克")
+    );
+    const shoppingBundles = [
+      { title: "鸡胸高蛋白", tag: "清爽主餐", icon: "🍗", description: "鸡肉搭配蔬菜和杂粮，几样基础食材轮换着做。", ingredients: ["鸡胸肉", "西兰花", "糙米饭", "胡萝卜", "包菜"], recipeNames: ["西兰花炒鸡胸", "糙米鸡肉蔬菜饭", "清炒包菜鸡胸"] },
+      { title: "虾仁鲜蔬快手", tag: "15-25 分钟", icon: "🍤", description: "虾仁、蛋和脆嫩蔬菜，炒菜、蒸蛋、荞麦面都能安排。", ingredients: ["虾仁", "鸡蛋", "西兰花", "西葫芦", "番茄", "芦笋", "荞麦面"], recipeNames: ["虾仁西兰花", "虾仁蒸蛋", "虾仁炒西葫芦", "蒜香虾仁芦笋", "番茄虾仁荞麦面"] },
+      { title: "豆腐菌菇素搭配", tag: "植物蛋白", icon: "🍄", description: "豆腐、菌菇与叶菜搭配，煮汤、蒸蛋、凉拌都合适。", ingredients: ["豆腐", "香菇", "菠菜", "番茄", "鸡蛋", "金针菇"], recipeNames: ["番茄豆腐汤", "香菇炖豆腐", "豆腐蒸蛋", "凉拌豆腐菠菜", "金针菇豆腐汤"] },
+      { title: "瘦牛肉下饭组", tag: "高蛋白主餐", icon: "🥩", description: "瘦牛肉配彩椒、西兰花与糙米，适合做成几份简餐。", ingredients: ["瘦牛肉", "彩椒", "西兰花", "糙米饭", "番茄", "白萝卜", "胡萝卜"], recipeNames: ["瘦牛肉西兰花", "彩椒牛肉丝", "黑椒牛肉饭", "番茄炖牛肉", "清炖牛肉萝卜"] },
+      { title: "燕麦鸡蛋早餐", tag: "早餐备餐", icon: "🥣", description: "燕麦、鸡蛋和蔬菜组成简单早餐，也可以作为轻晚餐。", ingredients: ["鸡蛋", "燕麦片", "菠菜", "西葫芦", "南瓜", "牛奶", "全麦面粉"], recipeNames: ["燕麦鸡蛋饼", "西葫芦鸡蛋饼", "南瓜燕麦粥鸡蛋", "全麦鸡蛋蔬菜饼", "菠菜鸡蛋汤"] },
+      { title: "鱼鲜清蒸组", tag: "少油做法", icon: "🐟", description: "鱼类配菌菇和番茄，以清蒸、炖煮为主，少用额外油脂。", ingredients: ["鳕鱼", "鲈鱼片", "鲳鱼", "蘑菇", "金针菇", "番茄", "姜"], recipeNames: ["清蒸鳕鱼", "番茄炖鳕鱼", "鳕鱼菌菇蒸", "清蒸鲈鱼片", "清蒸鲳鱼"] },
+      { title: "毛豆豆腐蔬菜", tag: "植物蛋白", icon: "🫛", description: "毛豆、豆腐、茄子和木耳，凉拌与家常热菜都能做。", ingredients: ["毛豆", "豆腐", "鸡蛋", "茄子", "黄瓜", "木耳", "瘦猪肉"], recipeNames: ["凉拌毛豆豆腐", "毛豆炒鸡蛋", "香煎豆腐茄子", "凉拌木耳黄瓜", "蒸茄子瘦肉末"] }
+    ];
+    const prepGuides = [
+      { name: "西葫芦", aliases: [], prep: "洗净并擦干；建议下锅前再切，提前切片容易出水。若要省时，可整根洗净、擦干后冷藏。", fridge: "完整状态冷藏约3至5天；切片后密封冷藏，尽量在1天内烹调。", freezer: "切片焯水约1分钟，沥干放凉后分装冷冻；解冻后更适合炖煮或炒菜。" },
+      { name: "茭白", aliases: ["茭笋"], prep: "剥去外壳和老根，洗净切片；可焯水约1分钟，迅速放凉并充分沥干。", fridge: "焯好后密封冷藏，建议2天内用完；生茭白保持干燥冷藏，临做再切。", freezer: "焯水、沥干后按一餐分装冷冻，适合之后做炖菜或炒菜。" },
+      { name: "菜花", aliases: ["花菜", "花椰菜"], prep: "掰成大小相近的小朵，冲洗后焯水1至2分钟，沥干并摊开放凉。", fridge: "焯好后密封冷藏，建议2天内用完；未处理的整颗冷藏更耐放。", freezer: "焯水后彻底沥干、分餐冷冻，后续无需完全解冻即可下锅。" },
+      { name: "洋葱", aliases: [], prep: "先剥外皮。可提前切丝或切丁，擦干表面水分后立即密封冷藏。", fridge: "切好的洋葱冷藏保存，建议1至2天内用完；整颗放在阴凉干燥处。", freezer: "切丁后分装冷冻，适合炖煮和炒菜；解冻后口感会变软。" },
+      { name: "黄瓜", aliases: [], prep: "整根擦干冷藏，吃前再洗；切片或拍黄瓜建议现做，提前加盐会大量出水。", fridge: "整根放蔬果抽屉并保持干燥；切开的部分包好冷藏，尽量当天吃完。", freezer: "不建议生冻，解冻后会明显变软、出水。" },
+      { name: "上海青", aliases: ["青菜", "小白菜"], prep: "逐片去掉泥沙，充分沥干；可把菜梗和叶片分开放，烹饪时先下梗后下叶。", fridge: "用厨房纸吸去水分，松松包好冷藏，建议2天内吃完。", freezer: "焯水约30秒、沥干后分装冷冻；适合煮汤，解冻后叶菜会变软。" },
+      { name: "包菜", aliases: ["卷心菜", "圆白菜"], prep: "剥去外层老叶，洗净沥干；切丝后可分成一餐份量，擦干再装盒。", fridge: "整颗冷藏较耐放；切开的部分包好冷藏，建议2至3天内用完。", freezer: "切丝后焯水约1分钟、放凉沥干再冷冻，适合熟炒或炖煮。" },
+      { name: "蒜黄", aliases: [], prep: "去掉根部和黄叶，洗净后充分沥干；切段最好留到下锅前，香气更足。", fridge: "用厨房纸包裹后装入透气袋冷藏，尽量在1至2天内烹调。", freezer: "冷冻会影响脆嫩口感，不建议生冻；可洗净擦干后冷藏短存。" },
+      { name: "丝瓜", aliases: [], prep: "洗净后再削皮，建议临做前切块，减少氧化变色和出水。", fridge: "整根干燥冷藏，建议数日内使用；切好后密封冷藏并尽量当天烹调。", freezer: "生冻后质地会变软，不适合追求爽脆口感的菜。" },
+      { name: "豆腐", aliases: ["嫩豆腐", "北豆腐"], prep: "开封后用干净容器和饮用水浸没，盖好冷藏；每天换水，使用前再切。", fridge: "按包装日期优先使用；开封后冷藏并尽量1至2天内吃完。", freezer: "可以冷冻，解冻后会形成蜂窝状，更适合炖煮；口感与新鲜豆腐不同。" },
+      { name: "番茄", aliases: ["西红柿"], prep: "烹饪前再清洗、去蒂和切块；需要备餐时可切丁分装，专供炖煮或做汤。", fridge: "切开的番茄密封冷藏，建议1天内用完；整颗成熟番茄冷藏前擦干。", freezer: "切丁分装冷冻，适合后续做汤、炖菜；解冻后会变软，不适合生食。" },
+      { name: "鸡蛋", aliases: [], prep: "保持蛋壳完整并放在原包装中冷藏；不要提前磕蛋液。可提前煮熟，冷却后及时冷藏。", fridge: "生蛋按包装建议冷藏；熟鸡蛋尽快冷藏，带壳保存更方便，建议一周内吃完。", freezer: "不建议带壳冷冻；蛋液如需冷冻，应打散后密封分装并标注日期。" },
+      { name: "平菇", aliases: ["蘑菇"], prep: "挑去杂质后撕成小片；储存前不浸泡，烹饪前快速冲洗并沥干。", fridge: "用纸袋或透气袋冷藏，保持干燥，建议2至3天内用完。", freezer: "先炒熟或焯水、沥干后分装冷冻；解冻后适合汤和炖菜。" },
+      { name: "排骨", aliases: [], prep: "按一餐份量分装；炖煮前冷水下锅焯2至3分钟，冲净浮沫。也可焯水后快速放凉再分装。", fridge: "生排骨密封放冰箱下层防止滴漏，建议1至2天内烹调；焯水熟排骨及时冷藏并尽快用完。", freezer: "近期不吃就尽早分装冷冻并标注日期；放冰箱冷藏解冻，不在室温下长时间解冻。" },
+      { name: "猪肉", aliases: ["猪里脊", "瘦猪肉"], prep: "不冲洗生肉以免飞溅；擦干后按一餐份量分装。切片可提前分装冷冻，烹饪前冷藏解冻。", fridge: "密封放冰箱下层并与即食食物分开，建议1至2天内烹调。", freezer: "分小份密封、标注日期并尽早冷冻；在冰箱冷藏室解冻，肉馅尤其要避免室温久放。" }
+    ];
+    const input = document.querySelector("#ingredient-input");
+    const chipList = document.querySelector("#chip-list");
+    const recipeList = document.querySelector("#recipe-list");
+    const resultCount = document.querySelector("#result-count");
+    const pantryCount = document.querySelector("#pantry-count");
+    const nextRecipesButton = document.querySelector("#next-recipes");
+    const cookTab = document.querySelector("#cook-tab");
+    const shoppingTab = document.querySelector("#shopping-tab");
+    const cookPanel = document.querySelector("#cook-panel");
+    const shoppingPanel = document.querySelector("#shopping-panel");
+    const shoppingGrid = document.querySelector("#shopping-grid");
+    const prepTab = document.querySelector("#prep-tab");
+    const prepPanel = document.querySelector("#prep-panel");
+    const howToCookTab = document.querySelector("#howtocook-tab");
+    const howToCookPanel = document.querySelector("#howtocook-panel");
+    const howToCookStatus = document.querySelector("#howtocook-status");
+    const howToCookRefreshButton = document.querySelector("#howtocook-refresh");
+    const howToCookResults = document.querySelector("#howtocook-results");
+    const howToCookMoreButton = document.querySelector("#howtocook-more");
+    const prepSearch = document.querySelector("#prep-search");
+    const prepGuidesContainer = document.querySelector("#prep-guides");
+    const weeklyTab = document.querySelector("#weekly-tab");
+    const weeklyPanel = document.querySelector("#weekly-panel");
+    const weeklyStatus = document.querySelector("#weekly-status");
+    const weeklyGenerateButton = document.querySelector("#weekly-generate");
+    const weeklyReshuffleButton = document.querySelector("#weekly-reshuffle");
+    const weeklyDays = document.querySelector("#weekly-days");
+    const weeklyShopping = document.querySelector("#weekly-shopping");
+    const weeklyShoppingList = document.querySelector("#weekly-shopping-list");
+    const weeklyShoppingUseButton = document.querySelector("#weekly-shopping-use");
+    const weeklyKey = "meal-inspiration-weekly-v1";
+    let recipePage = 0;
+    let howToCookPage = 0;
+    let howToCookIndex = null;
+    let howToCookRequest = null;
+    let pantry = loadPantry();
+    let toastTimer;
+    let weeklyRequest = null;
+    let weeklyPlan = loadWeeklyPlan();
+
+    function loadWeeklyPlan() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(weeklyKey) || "null");
+        if (!saved || !saved.plan || !Array.isArray(saved.plan.days) || !Array.isArray(saved.ingredients)) return null;
+        return saved;
+      } catch {
+        return null;
+      }
+    }
+
+    function samePantry(first, second) {
+      if (first.length !== second.length) return false;
+      const a = [...first].sort();
+      const b = [...second].sort();
+      return a.every((name, index) => name === b[index]);
+    }
+
+    function canonical(name) {
+      const cleaned = name.trim().replace(/\s+/g, "");
+      return aliases[cleaned] || cleaned;
+    }
+
+    function loadPantry() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(pantryKey) || "[]");
+        return Array.isArray(saved) ? [...new Set(saved.map(canonical).filter(Boolean))] : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function savePantry() {
+      try { localStorage.setItem(pantryKey, JSON.stringify(pantry)); } catch { showToast("浏览器未能保存食材，但当前页面仍可正常使用"); }
+    }
+
+    function showToast(message) {
+      const toast = document.querySelector("#toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1900);
+    }
+
+    function addIngredients(value) {
+      const additions = value.split(/[，,、;；\n]+/).map(canonical).filter(Boolean);
+      let added = 0;
+      for (const ingredient of additions) {
+        if (!pantry.includes(ingredient)) { pantry.push(ingredient); added += 1; }
+      }
+      if (added) {
+        savePantry();
+        render();
+      } else if (additions.length) {
+        showToast("这个食材已经在清单里啦");
+      }
+      input.value = "";
+      input.focus();
+    }
+
+    function matchingRecipes() {
+      const available = new Set(pantry.map(canonical));
+      const candidates = [...recipes, ...generateFlexibleRecipes(available)];
+      return candidates.map((recipe) => {
+        const essentials = recipe.ingredients.filter(([name]) => !pantryStaples.has(name));
+        const matched = essentials.filter(([name]) => available.has(canonical(name)));
+        const missing = essentials.filter(([name]) => !available.has(canonical(name)));
+        return { ...recipe, matched, missing, score: matched.length / essentials.length };
+      }).filter((recipe) => recipe.matched.length > 0)
+        .sort((first, second) => second.score - first.score || Number(Boolean(second.dynamic)) - Number(Boolean(first.dynamic)) || first.missing.length - second.missing.length || first.time - second.time)
+        .map((recipe, index) => ({ ...recipe, isBest: index === 0 }));
+    }
+
+    function generateFlexibleRecipes(available) {
+      const vegetables = new Set(["西葫芦", "茭白", "菜花", "洋葱", "黄瓜", "青菜", "包菜", "蒜黄", "丝瓜", "蘑菇", "菠菜", "西兰花", "白菜", "胡萝卜", "番茄", "芦笋", "茄子", "木耳", "彩椒", "玉米", "南瓜", "荷兰豆", "芹菜", "西芹"]);
+      const availableVegetables = [...available].filter((name) => vegetables.has(name));
+      const preferred = (order) => [...new Set([...order, ...availableVegetables])].filter((name) => available.has(name) && vegetables.has(name)).slice(0, 2);
+      const generated = [];
+
+      function isAlreadyCovered(required) {
+        return recipes.some((recipe) => {
+          const items = recipe.ingredients.filter(([name]) => !pantryStaples.has(name)).map(([name]) => canonical(name));
+          return required.every((name) => items.includes(name)) && items.every((name) => available.has(name));
+        });
+      }
+
+      function addCombination(kind, main, sideVegetables) {
+        if (sideVegetables.length === 0 || isAlreadyCovered([main, ...sideVegetables])) return;
+        const vegetablesText = sideVegetables.join("、");
+        const vegetableTitle = sideVegetables.join("");
+        const profiles = {
+          egg: { name: `${vegetableTitle}滑蛋`, icon: "🥚", amount: "2个", kcal: 210, protein: 15, time: 18, steps: [`${vegetablesText}洗净切片或切段；鸡蛋打散。`, "不粘锅放少量油，先把不易熟的蔬菜炒至断生。", "倒入蛋液炒至完全凝固，少盐调味即可。"] },
+          pork: { name: `${vegetableTitle}炒肉片`, icon: "🥢", amount: "120克（选瘦肉）", kcal: 300, protein: 27, time: 20, steps: [`${vegetablesText}洗净切好，猪肉切薄片。`, "少量油先将肉片炒至完全熟透后盛出。", "蔬菜炒熟，倒回肉片翻匀，少量生抽调味。"] },
+          tofu: { name: `${vegetableTitle}豆腐煲`, icon: "🍲", amount: "150克", kcal: 240, protein: 18, time: 22, steps: [`${vegetablesText}洗净切好，豆腐切块。`, "锅中加少量水或高汤，先煮不易熟的蔬菜。", "加入豆腐焖煮至食材熟透，少盐调味。"] },
+          ribs: { name: `排骨${vegetableTitle}汤`, icon: "🥣", amount: "150克", kcal: 420, protein: 27, time: 65, steps: ["排骨冷水下锅焯2至3分钟，捞出冲净浮沫。", "加清水小火炖至排骨熟透、软烂，撇去表面浮油。", `${vegetablesText}切好后加入锅中煮熟，最后少量盐调味。`] },
+          vegetables: { name: `${vegetableTitle}双蔬快炒`, icon: "🥬", amount: "各约100克", kcal: 150, protein: 5, time: 15, steps: [`${vegetablesText}洗净切好；菜花、茭白等较硬蔬菜可先焯水。`, "不粘锅放少量油，先炒较硬的蔬菜，再加入易熟蔬菜。", "炒至熟透后用蒜末、醋或少量盐调味。"] }
+        };
+        const profile = profiles[kind];
+        const mainIngredient = kind === "vegetables" ? [] : [[main, profile.amount]];
+        const ingredients = [...mainIngredient, ...sideVegetables.map((name) => [name, "约80克"]), ["食用油", kind === "ribs" ? "0克" : "5克"], ["盐", "约1克"]];
+        generated.push({ name: profile.name, icon: profile.icon, time: profile.time, level: "按手头食材组合", kcal: profile.kcal, protein: profile.protein, oil: kind === "ribs" ? "0克" : "5克", salt: "约1克", ingredients, steps: profile.steps, dynamic: true });
+      }
+
+      const egg = [...available].find((name) => name === "鸡蛋");
+      const pork = [...available].find((name) => name === "猪肉");
+      const tofu = [...available].find((name) => name === "豆腐");
+      const ribs = [...available].find((name) => name === "排骨");
+      if (egg) addCombination("egg", egg, preferred(["番茄", "蒜黄", "西葫芦", "丝瓜", "青菜", "蘑菇", "菜花", "洋葱", "包菜", "茭白"]));
+      if (pork) addCombination("pork", pork, preferred(["茭白", "蒜黄", "西葫芦", "包菜", "菜花", "洋葱", "青菜", "蘑菇", "丝瓜", "番茄"]));
+      if (tofu) addCombination("tofu", tofu, preferred(["蘑菇", "番茄", "丝瓜", "菜花", "茭白", "青菜", "包菜", "洋葱"]));
+      if (ribs) addCombination("ribs", ribs, preferred(["茭白", "菜花", "洋葱", "番茄", "包菜"]));
+      if (availableVegetables.length) addCombination("vegetables", "食材", preferred(["西葫芦", "茭白", "菜花", "青菜", "包菜", "洋葱", "蘑菇", "丝瓜", "蒜黄"]));
+      return generated;
+    }
+
+    function render() {
+      recipePage = 0;
+      chipList.replaceChildren();
+      if (pantry.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty-pantry";
+        empty.textContent = "食材会出现在这里，先添加几样吧";
+        chipList.append(empty);
+      } else {
+        pantry.forEach((ingredient) => {
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          const label = document.createElement("span");
+          label.textContent = ingredient;
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.textContent = "×";
+          remove.setAttribute("aria-label", `移除${ingredient}`);
+          remove.addEventListener("click", () => {
+            pantry = pantry.filter((item) => item !== ingredient);
+            savePantry();
+            render();
+          });
+          chip.append(label, remove);
+          chipList.append(chip);
+        });
+      }
+      pantryCount.textContent = pantry.length ? `已添加 ${pantry.length} 种食材` : "还没有添加食材";
+      document.querySelectorAll(".suggestion").forEach((button) => {
+        button.disabled = pantry.includes(button.dataset.ingredient);
+        button.setAttribute("aria-pressed", String(button.disabled));
+      });
+      renderRecipes();
+      if (howToCookIndex && !howToCookPanel.hidden) renderHowToCookResults();
+      updateWeeklyStatus();
+    }
+
+    function renderRecipes() {
+      recipeList.replaceChildren();
+      if (pantry.length === 0) {
+        resultCount.textContent = "等你添加食材";
+        nextRecipesButton.hidden = true;
+        recipeList.append(makeEmpty("先加几样食材", "点左边的常见食材，或者输入冰箱里现有的东西。"));
+        return;
+      }
+      const matches = matchingRecipes();
+      if (matches.length === 0) {
+        resultCount.textContent = "暂时没有匹配";
+        nextRecipesButton.hidden = true;
+        recipeList.append(makeEmpty("还没找到合适的菜", "试着再加一种常见食材，比如鸡蛋、番茄、土豆或豆腐。"));
+        return;
+      }
+      const pageSize = 5;
+      const pageCount = Math.ceil(matches.length / pageSize);
+      recipePage %= pageCount;
+      const pageMatches = matches.slice(recipePage * pageSize, (recipePage + 1) * pageSize);
+      resultCount.textContent = `匹配 ${matches.length} 道 · 第 ${recipePage + 1}/${pageCount} 页`;
+      nextRecipesButton.hidden = pageCount < 2;
+      nextRecipesButton.innerHTML = `再看几道 <span aria-hidden="true">→</span>`;
+      pageMatches.forEach((recipe, index) => recipeList.append(makeRecipeCard(recipe, index)));
+    }
+
+    function setMode(mode) {
+      const shoppingMode = mode === "shopping";
+      const prepMode = mode === "prep";
+      const howToCookMode = mode === "howtocook";
+      const weeklyMode = mode === "weekly";
+      shoppingTab.setAttribute("aria-selected", String(shoppingMode));
+      prepTab.setAttribute("aria-selected", String(prepMode));
+      howToCookTab.setAttribute("aria-selected", String(howToCookMode));
+      weeklyTab.setAttribute("aria-selected", String(weeklyMode));
+      cookTab.setAttribute("aria-selected", String(!shoppingMode && !prepMode && !howToCookMode && !weeklyMode));
+      cookPanel.hidden = shoppingMode || prepMode || howToCookMode || weeklyMode;
+      shoppingPanel.hidden = !shoppingMode;
+      prepPanel.hidden = !prepMode;
+      howToCookPanel.hidden = !howToCookMode;
+      weeklyPanel.hidden = !weeklyMode;
+      if (shoppingMode) renderShoppingBundles();
+      if (prepMode) renderPrepGuides(prepSearch.value);
+      if (howToCookMode) loadHowToCookIndex();
+      if (weeklyMode) renderWeekly();
+    }
+
+    function encodeHowToCookPath(path) {
+      return path.split("/").map((part) => {
+        try { return encodeURIComponent(decodeURIComponent(part)); } catch { return encodeURIComponent(part); }
+      }).join("/");
+    }
+
+    async function loadHowToCookIndex(forceRefresh = false) {
+      if (howToCookRequest) return howToCookRequest;
+      if (howToCookIndex && !forceRefresh) {
+        renderHowToCookResults();
+        return;
+      }
+      howToCookRefreshButton.disabled = true;
+      howToCookStatus.textContent = "正在读取菜谱目录…";
+      howToCookRequest = (async () => {
+        try {
+          const response = await fetch(howToCookReadmeUrl, { cache: forceRefresh ? "no-cache" : "default" });
+          if (!response.ok) throw new Error(`GitHub 返回 ${response.status}`);
+          const readme = await response.text();
+          const entries = new Map();
+          for (const match of readme.matchAll(/\[([^\]]+)\]\((dishes\/[^)\s]+\.md)\)/g)) {
+            const title = match[1].trim();
+            const path = match[2].trim();
+            if (!title || title === "示例菜" || entries.has(path)) continue;
+            const encodedPath = encodeHowToCookPath(path);
+            entries.set(path, {
+              title,
+              rawUrl: howToCookRawBase + encodedPath,
+              sourceUrl: `https://github.com/Anduin2017/HowToCook/blob/master/${encodedPath}`
+            });
+          }
+          howToCookIndex = [...entries.values()];
+          if (!howToCookIndex.length) throw new Error("目录中没有识别到菜谱链接");
+          howToCookPage = 0;
+          howToCookStatus.textContent = `已读取 ${howToCookIndex.length} 道菜谱；按菜名中的食材词匹配。`;
+          renderHowToCookResults();
+        } catch (error) {
+          howToCookStatus.textContent = `在线菜库暂时无法连接：${error.message}。本地菜谱仍可使用。`;
+          howToCookResults.replaceChildren(makeEmpty("暂时无法读取在线菜库", "检查网络后点“更新目录”重试；本地菜谱不受影响。"));
+          howToCookMoreButton.hidden = true;
+        } finally {
+          howToCookRefreshButton.disabled = false;
+          howToCookRequest = null;
+        }
+      })();
+      return howToCookRequest;
+    }
+
+    function howToCookSearchTerms(ingredient) {
+      const normalized = canonical(ingredient);
+      const equivalents = Object.entries(aliases).filter(([, value]) => value === normalized).map(([alias]) => alias);
+      const extraTerms = normalized === "猪肉" ? ["肉片", "肉丝", "炒肉", "瘦肉"] : normalized === "鸡蛋" ? ["滑蛋", "蛋花"] : [];
+      return [...new Set([ingredient, normalized, ...equivalents, ...extraTerms].map((term) => term.replace(/\s+/g, "")).filter((term) => term.length > 1))];
+    }
+
+    function renderHowToCookResults() {
+      howToCookResults.replaceChildren();
+      if (!howToCookIndex) return;
+      if (!pantry.length) {
+        howToCookResults.append(makeEmpty("先添加一些食材", "菜名会按你的食材清单进行匹配。"));
+        howToCookMoreButton.hidden = true;
+        return;
+      }
+      const termsByIngredient = pantry.map((ingredient) => ({ ingredient, terms: howToCookSearchTerms(ingredient) }));
+      const matches = howToCookIndex.map((recipe) => {
+        const title = recipe.title.replace(/\s+/g, "");
+        const matchedIngredients = termsByIngredient.filter(({ terms }) => terms.some((term) => title.includes(term))).map(({ ingredient }) => ingredient);
+        return { ...recipe, matchedIngredients };
+      }).filter((recipe) => recipe.matchedIngredients.length)
+        .sort((first, second) => second.matchedIngredients.length - first.matchedIngredients.length || first.title.localeCompare(second.title, "zh-CN"));
+      if (!matches.length) {
+        howToCookResults.append(makeEmpty("暂时没有标题匹配的菜", "可尝试用更短的食材名，或换到本地菜谱查看组合推荐。"));
+        howToCookMoreButton.hidden = true;
+        return;
+      }
+      const pageSize = 8;
+      const pageCount = Math.ceil(matches.length / pageSize);
+      howToCookPage %= pageCount;
+      const pageMatches = matches.slice(howToCookPage * pageSize, (howToCookPage + 1) * pageSize);
+      howToCookStatus.textContent = `当前食材匹配到 ${matches.length} 道；第 ${howToCookPage + 1}/${pageCount} 页。`;
+      howToCookMoreButton.hidden = pageCount < 2;
+      pageMatches.forEach((recipe) => howToCookResults.append(makeHowToCookCard(recipe)));
+    }
+
+    function getMarkdownSection(markdown, sectionName) {
+      const lines = markdown.split(/\r?\n/);
+      const start = lines.findIndex((line) => line.match(/^##\s+(.+?)\s*$/)?.[1] === sectionName);
+      if (start < 0) return [];
+      let end = lines.findIndex((line, index) => index > start && /^##\s+/.test(line));
+      if (end < 0) end = lines.length;
+      return lines.slice(start + 1, end);
+    }
+
+    function parseHowToCookMarkdown(markdown) {
+      const listItems = (lines) => lines.map((line) => line.match(/^\s*[-*+•]\s+(.+?)\s*$/)?.[1]).filter(Boolean);
+      const operation = getMarkdownSection(markdown, "操作");
+      const steps = operation.map((line) => line.match(/^\s*\d+[.、)]\s*(.+?)\s*$/)?.[1]).filter(Boolean);
+      const calculation = getMarkdownSection(markdown, "计算");
+      const amountStart = calculation.findIndex((line) => /每份\s*[:：]/.test(line));
+      const amounts = amountStart >= 0 ? listItems(calculation.slice(amountStart + 1)) : [];
+      const calories = markdown.match(/预估卡路里\s*[:：]\s*([\d,.]+)/)?.[1];
+      return { materials: listItems(getMarkdownSection(markdown, "必备原料和工具")), amounts, steps, calories };
+    }
+
+    async function loadHowToCookDetails(recipe, content) {
+      content.dataset.state = "loading";
+      content.textContent = "正在读取原料与做法…";
+      try {
+        const response = await fetch(recipe.rawUrl);
+        if (!response.ok) throw new Error(`GitHub 返回 ${response.status}`);
+        const parsed = parseHowToCookMarkdown(await response.text());
+        content.replaceChildren();
+        content.dataset.state = "loaded";
+        const grid = document.createElement("div");
+        grid.className = "detail-grid";
+        const ingredientSection = document.createElement("section");
+        const ingredientHeading = document.createElement("h3");
+        ingredientHeading.textContent = parsed.amounts.length ? "原文份量" : "所需原料";
+        const ingredientList = document.createElement("ul");
+        ingredientList.className = "ingredient-lines";
+        (parsed.amounts.length ? parsed.amounts : parsed.materials).forEach((entry) => {
+          const item = document.createElement("li");
+          item.textContent = entry;
+          ingredientList.append(item);
+        });
+        ingredientSection.append(ingredientHeading, ingredientList);
+        const methodSection = document.createElement("section");
+        const methodHeading = document.createElement("h3");
+        methodHeading.textContent = "原文做法";
+        const methodList = document.createElement("ol");
+        methodList.className = "steps";
+        parsed.steps.forEach((step) => {
+          const item = document.createElement("li");
+          item.textContent = step;
+          methodList.append(item);
+        });
+        if (!parsed.steps.length) {
+          const unavailable = document.createElement("p");
+          unavailable.className = "howtocook-status";
+          unavailable.textContent = "未能从此页面提取步骤，请打开来源查看。";
+          methodSection.append(methodHeading, unavailable);
+        } else {
+          methodSection.append(methodHeading, methodList);
+        }
+        grid.append(ingredientSection, methodSection);
+        const source = document.createElement("a");
+        source.className = "howtocook-source";
+        source.href = recipe.sourceUrl;
+        source.target = "_blank";
+        source.rel = "noopener noreferrer";
+        source.textContent = "查看 HowToCook 原文";
+        content.append(grid);
+        const note = document.createElement("p");
+        note.className = "howtocook-note";
+        note.textContent = `来自开源原方${parsed.calories ? `；原文估算约 ${parsed.calories} 千卡` : ""}。原方用油、盐可能较多，减脂或控盐时请查看份量并按需调整。`;
+        content.append(note, source);
+      } catch (error) {
+        content.dataset.state = "error";
+        content.textContent = `无法读取此菜谱：${error.message}。可直接打开来源链接重试。`;
+      }
+    }
+
+    function makeHowToCookCard(recipe) {
+      const card = document.createElement("details");
+      card.className = "recipe-card";
+      const summary = document.createElement("summary");
+      summary.className = "recipe-summary";
+      const icon = document.createElement("span");
+      icon.className = "dish-icon";
+      icon.textContent = "🍲";
+      icon.setAttribute("aria-hidden", "true");
+      const main = document.createElement("span");
+      main.className = "recipe-main";
+      const titleRow = document.createElement("span");
+      titleRow.className = "recipe-title-row";
+      const title = document.createElement("span");
+      title.className = "recipe-title";
+      title.textContent = recipe.title;
+      const badge = document.createElement("span");
+      badge.className = "match-badge";
+      badge.textContent = "HowToCook";
+      titleRow.append(title, badge);
+      const meta = document.createElement("span");
+      meta.className = "recipe-meta";
+      const matched = document.createElement("span");
+      matched.textContent = `标题命中：${recipe.matchedIngredients.join("、")}`;
+      meta.append(matched);
+      main.append(titleRow, meta);
+      const count = document.createElement("span");
+      count.className = "match-ring";
+      count.textContent = `${recipe.matchedIngredients.length}种`;
+      count.setAttribute("aria-label", `标题命中${recipe.matchedIngredients.length}种食材`);
+      const chevron = document.createElement("span");
+      chevron.className = "chevron";
+      chevron.textContent = "⌄";
+      chevron.setAttribute("aria-hidden", "true");
+      summary.append(icon, main, count, chevron);
+      const content = document.createElement("div");
+      content.className = "recipe-details";
+      const divider = document.createElement("div");
+      divider.className = "detail-divider";
+      const loading = document.createElement("p");
+      loading.className = "howtocook-status";
+      loading.textContent = "展开时加载原料和做法。";
+      content.append(divider, loading);
+      card.append(summary, content);
+      card.addEventListener("toggle", () => {
+        if (card.open && !content.dataset.state) loadHowToCookDetails(recipe, content);
+      });
+      return card;
+    }
+
+    function renderPrepGuides(value) {
+      prepGuidesContainer.replaceChildren();
+      const query = canonical(value.trim());
+      if (!query) {
+        prepGuidesContainer.append(makeEmpty("搜索一种食材", "输入食材名称，或点上方的常用食材，查询切配和保存方法。"));
+        return;
+      }
+      const matches = prepGuides.filter((guide) => [guide.name, ...guide.aliases].some((name) => {
+        const normalized = canonical(name);
+        return normalized.includes(query) || query.includes(normalized);
+      }));
+      if (matches.length === 0) {
+        prepGuidesContainer.append(makeEmpty("暂时没有这项指南", "试试食材常用名称，或先查看相近的食材名称。"));
+        return;
+      }
+      matches.forEach((guide) => {
+        const card = document.createElement("article");
+        card.className = "prep-guide";
+        const title = document.createElement("h3");
+        title.textContent = guide.name;
+        const grid = document.createElement("div");
+        grid.className = "prep-guide-grid";
+        [["提前预处理", guide.prep], ["冷藏保存", guide.fridge], ["冷冻保存", guide.freezer]].forEach(([label, text]) => {
+          const block = document.createElement("section");
+          block.className = "prep-guide-block";
+          const heading = document.createElement("h4");
+          heading.textContent = label;
+          const copy = document.createElement("p");
+          copy.textContent = text;
+          block.append(heading, copy);
+          grid.append(block);
+        });
+        const safety = document.createElement("p");
+        safety.className = "prep-safety-note";
+        safety.textContent = "食品安全提示：冰箱冷藏室建议保持在4℃或以下；生肉密封放下层并与即食食物分开。处理后若出现异味、黏液或霉变，请勿食用。";
+        card.append(title, grid, safety);
+        prepGuidesContainer.append(card);
+      });
+    }
+
+    function renderShoppingBundles() {
+      shoppingGrid.replaceChildren();
+      const recipesByName = new Map(recipes.map((recipe) => [recipe.name, recipe]));
+      shoppingBundles.forEach((bundle) => {
+        const card = document.createElement("article");
+        card.className = "shopping-pack";
+        const header = document.createElement("div");
+        header.className = "shopping-pack-head";
+        const icon = document.createElement("span");
+        icon.className = "shopping-pack-icon";
+        icon.textContent = bundle.icon;
+        icon.setAttribute("aria-hidden", "true");
+        const heading = document.createElement("div");
+        const tag = document.createElement("p");
+        tag.className = "shopping-pack-tag";
+        tag.textContent = bundle.tag;
+        const title = document.createElement("h3");
+        title.textContent = bundle.title;
+        heading.append(tag, title);
+        header.append(icon, heading);
+        const description = document.createElement("p");
+        description.className = "shopping-description";
+        description.textContent = bundle.description;
+        const ingredientsLabel = document.createElement("p");
+        ingredientsLabel.className = "shopping-label";
+        ingredientsLabel.textContent = `建议采购 · ${bundle.ingredients.length} 种食材`;
+        const ingredients = document.createElement("div");
+        ingredients.className = "shopping-items";
+        bundle.ingredients.forEach((name) => {
+          const item = document.createElement("span");
+          item.className = "shopping-item";
+          item.textContent = name;
+          ingredients.append(item);
+        });
+        const dishes = document.createElement("details");
+        dishes.className = "shopping-dishes";
+        const dishesSummary = document.createElement("summary");
+        dishesSummary.textContent = `这组食材能搭配 ${bundle.recipeNames.length} 道菜`;
+        const dishList = document.createElement("ul");
+        dishList.className = "shopping-dish-list";
+        bundle.recipeNames.forEach((name) => {
+          const recipe = recipesByName.get(name);
+          if (!recipe) return;
+          const line = document.createElement("li");
+          line.className = "shopping-dish";
+          const dishName = document.createElement("span");
+          dishName.textContent = name;
+          const meta = document.createElement("span");
+          meta.textContent = `${recipe.time} 分钟 · 约 ${recipe.kcal} 千卡`;
+          line.append(dishName, meta);
+          dishList.append(line);
+        });
+        dishes.append(dishesSummary, dishList);
+        const useButton = document.createElement("button");
+        useButton.className = "shopping-use";
+        useButton.type = "button";
+        useButton.textContent = "加入食材清单，查看做法";
+        useButton.addEventListener("click", () => {
+          const previousCount = pantry.length;
+          pantry = [...new Set([...pantry, ...bundle.ingredients.map(canonical)])];
+          savePantry();
+          setMode("cook");
+          render();
+          showToast(`已加入 ${pantry.length - previousCount} 种食材`);
+          cookPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        card.append(header, description, ingredientsLabel, ingredients, dishes, useButton);
+        shoppingGrid.append(card);
+      });
+    }
+
+    // 一周食谱排菜核心（服务器与离线兜底共用同一实现）：
+    // 传入菜谱列表与食材清单，返回 7 天 × 午餐/晚餐 的排菜方案。
+    // 服务器端由 npm run db:sync 将本函数原样同步到 data/flex-recipes.mjs，配合 SQLite 菜谱数据使用；
+    // 连不上服务器时，浏览器直接用内置菜谱调用本函数离线排菜。修改本函数后需重新运行 npm run db:sync。
+    function generateWeeklyPlanCore(staticRecipes, inputIngredients, seedInput = "") {
+      const weekdayNames = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+      const slotNames = ["lunch", "dinner"];
+      const proteinKeywords = [
+        ["蛋", ["鸡蛋"]],
+        ["禽", ["鸡胸肉", "鸡腿肉"]],
+        ["畜", ["猪肉", "猪里脊", "排骨", "牛肉", "牛腩"]],
+        ["虾", ["虾仁", "虾皮"]],
+        ["鱼", ["鳕鱼", "鲈鱼", "三文鱼", "鲳鱼"]],
+        ["豆", ["豆腐", "豆皮", "鹰嘴豆", "毛豆"]]
+      ];
+      function proteinCategory(recipe) {
+        for (const [ingredient] of recipe.ingredients) {
+          const normalized = canonical(ingredient);
+          for (const [category, keywords] of proteinKeywords) {
+            if (keywords.some((keyword) => normalized.includes(keyword))) return category;
+          }
+        }
+        return "素";
+      }
+      // 打分与浏览器端 matchingRecipes 一致：essentials 排除常用调料，score = matched / essentials
+      function matchingCandidates(available) {
+        const candidates = [...staticRecipes, ...generateFlexibleRecipes(available)];
+        return candidates
+          .map((recipe) => {
+            const essentials = recipe.ingredients.filter(([name]) => !pantryStaples.has(name));
+            const matched = essentials.filter(([name]) => available.has(canonical(name)));
+            const missing = essentials.filter(([name]) => !available.has(canonical(name)));
+            return {
+              ...recipe,
+              matched,
+              missing,
+              score: matched.length / essentials.length,
+              dynamic: Boolean(recipe.dynamic),
+              proteinCategory: proteinCategory(recipe)
+            };
+          })
+          .filter((recipe) => recipe.matched.length > 0)
+          .sort((first, second) => second.score - first.score || Number(Boolean(second.dynamic)) - Number(Boolean(first.dynamic)) || first.missing.length - second.missing.length || first.time - second.time);
+      }
+      function fnv1a(text) {
+        let hash = 0x811c9dc5;
+        for (let index = 0; index < text.length; index += 1) {
+          hash ^= text.charCodeAt(index);
+          hash = Math.imul(hash, 0x01000193);
+        }
+        return hash >>> 0;
+      }
+      function mulberry32(seed) {
+        let state = seed >>> 0;
+        return () => {
+          state = (state + 0x6d2b79f5) >>> 0;
+          let value = state;
+          value = Math.imul(value ^ (value >>> 15), value | 1);
+          value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+          return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      const ingredients = [...new Set(inputIngredients.map(canonical).filter(Boolean))];
+      const available = new Set(ingredients);
+      const candidates = matchingCandidates(available);
+      // 不带 seed 时由食材清单导出确定性种子：同一清单每次生成结果稳定
+      const seed = seedInput ? fnv1a(seedInput) : fnv1a([...ingredients].sort().join("、"));
+      const random = mulberry32(seed);
+
+      // 逐餐位贪心。约束按阶梯放宽：
+      // L0 未用过的菜；L1 重复菜但距上次出现 ≥2 槽且次数 < cap；L2 仅限次数；L3 仅不与上一槽相同；L4 全部候选
+      const meals = [];
+      const pickForSlot = () => {
+        const usage = new Map();
+        const lastSlot = new Map();
+        meals.forEach((meal, index) => {
+          if (!meal.recipe) return;
+          usage.set(meal.recipe.name, (usage.get(meal.recipe.name) || 0) + 1);
+          lastSlot.set(meal.recipe.name, index);
+        });
+        const previousName = meals[meals.length - 1]?.recipe?.name;
+        const previousCategory = meals[meals.length - 1]?.recipe?.proteinCategory;
+        const repeatCap = candidates.length < 4 ? 4 : 2;
+        let pool = candidates.filter((candidate) => !usage.has(candidate.name));
+        if (!pool.length) pool = candidates.filter((candidate) => candidate.name !== previousName && (usage.get(candidate.name) || 0) < repeatCap && meals.length - (lastSlot.get(candidate.name) ?? -Infinity) >= 2);
+        if (!pool.length) pool = candidates.filter((candidate) => candidate.name !== previousName && (usage.get(candidate.name) || 0) < repeatCap);
+        if (!pool.length) pool = candidates.filter((candidate) => candidate.name !== previousName);
+        if (!pool.length) pool = candidates;
+        let best = null;
+        let bestScore = -Infinity;
+        for (const candidate of pool) {
+          const value = candidate.score * 100 - candidate.missing.length * 6 - (candidate.proteinCategory === previousCategory ? 12 : 0) + random() * 3;
+          if (value > bestScore) {
+            bestScore = value;
+            best = candidate;
+          }
+        }
+        return best;
+      };
+
+      for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
+        for (const slot of slotNames) {
+          const recipe = candidates.length ? pickForSlot() : null;
+          const repeated = Boolean(recipe && meals.some((meal) => meal.recipe && meal.recipe.name === recipe.name));
+          meals.push({ slot, repeated, recipe });
+        }
+      }
+
+      // 组装 7 天（从今天开始）
+      const start = new Date();
+      const days = [];
+      for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
+        const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + dayIndex);
+        days.push({
+          date: `${date.getMonth() + 1}月${date.getDate()}日`,
+          weekday: weekdayNames[date.getDay()],
+          isToday: dayIndex === 0,
+          meals: meals.slice(dayIndex * 2, dayIndex * 2 + 2)
+        });
+      }
+
+      // 本周需要补买：按 canonical 名聚合出现次数，不聚合用量（"半根"+"150克"不可相加）
+      const shopping = new Map();
+      for (const meal of meals) {
+        if (!meal.recipe) continue;
+        for (const [name] of meal.recipe.missing) {
+          const key = canonical(name);
+          if (!shopping.has(key)) shopping.set(key, { name: key, count: 0, meals: new Set() });
+          const entry = shopping.get(key);
+          entry.count += 1;
+          entry.meals.add(meal.recipe.name);
+        }
+      }
+      const shoppingList = [...shopping.values()]
+        .map((entry) => ({ name: entry.name, count: entry.count, meals: [...entry.meals] }))
+        .sort((first, second) => second.count - first.count || first.name.localeCompare(second.name, "zh-CN"));
+
+      const planned = meals.filter((meal) => meal.recipe);
+      const repeatNames = [...new Set(meals.filter((meal) => meal.repeated).map((meal) => meal.recipe.name))];
+      const usedPantry = new Set(planned.flatMap((meal) => meal.recipe.matched.map(([name]) => canonical(name))));
+      const totalKcal = planned.reduce((sum, meal) => sum + meal.recipe.kcal, 0);
+      const totalProtein = planned.reduce((sum, meal) => sum + meal.recipe.protein, 0);
+      const suggestions = ["鸡蛋", "番茄", "土豆", "豆腐"].filter((name) => !available.has(name));
+      let notice = "";
+      if (candidates.length === 0) {
+        notice = "这些食材暂时配不出菜谱，建议先补充常见食材，或到「帮我搭配买菜」看看。";
+      } else if (repeatNames.length) {
+        notice = `现有食材能配的菜比较少，${repeatNames.join("、")} 会重复安排；补充几种食材可以排得更丰富。`;
+      }
+
+      return {
+        seed: seedInput || String(seed),
+        startDate: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-${String(start.getDate()).padStart(2, "0")}`,
+        ingredients,
+        days,
+        shoppingList,
+        stats: {
+          candidateCount: candidates.length,
+          repeatCount: meals.filter((meal) => meal.repeated).length,
+          distinctDishes: new Set(planned.map((meal) => meal.recipe.name)).size,
+          avgKcal: Math.round(totalKcal / 7),
+          avgProtein: Math.round(totalProtein / 7),
+          pantryCoverage: ingredients.length ? Math.round((usedPantry.size / ingredients.length) * 100) : 0
+        },
+        repeatNames,
+        notice,
+        suggestions
+      };
+    }
+
+    async function generateWeekly(reshuffle = false) {
+      if (!pantry.length) { showToast("先添加几样食材，再生成一周食谱"); return; }
+      if (weeklyRequest) return weeklyRequest;
+      weeklyGenerateButton.disabled = true;
+      weeklyReshuffleButton.disabled = true;
+      weeklyStatus.textContent = "正在排一周食谱…";
+      const seedParam = reshuffle ? `&seed=${Math.random().toString(36).slice(2)}` : "";
+      const request = (async () => {
+        try {
+          const response = await fetch(`./api/weekly-plan?ingredients=${encodeURIComponent(pantry.join(","))}${seedParam}&_=${Date.now()}`, { cache: "no-store" });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || `服务返回 ${response.status}`);
+          weeklyPlan = { plan: data, ingredients: [...pantry] };
+        } catch (error) {
+          // 离线兜底：连不上服务器时，用内置菜谱在本地排一周食谱
+          const fallbackSeed = reshuffle ? seedParam.slice(6) : "";
+          weeklyPlan = { plan: { ...generateWeeklyPlanCore(recipes, pantry, fallbackSeed), offline: true }, ingredients: [...pantry] };
+        }
+        try { localStorage.setItem(weeklyKey, JSON.stringify(weeklyPlan)); } catch { showToast("浏览器未能保存一周食谱，但本次结果仍可查看"); }
+        renderWeekly();
+        showToast(weeklyPlan.plan.offline ? "服务器未连接，已用内置菜谱离线排好" : "一周食谱已生成");
+      })();
+      weeklyRequest = request;
+      request.finally(() => {
+        weeklyGenerateButton.disabled = false;
+        weeklyReshuffleButton.disabled = false;
+        weeklyRequest = null;
+      }).catch(() => {});
+      return request;
+    }
+
+    function weeklyStatusText() {
+      const { plan, ingredients } = weeklyPlan;
+      if (!samePantry(ingredients, pantry)) {
+        return "食材清单已变化：下面显示的是按旧清单排的计划，点“按当前食材重新生成”更新。";
+      }
+      const mealCount = plan.days.reduce((sum, day) => sum + day.meals.length, 0);
+      let text = `已排 ${plan.days.length} 天 ${mealCount} 餐 · 平均约 ${plan.stats.avgKcal} 千卡/天 · 不重样 ${plan.stats.distinctDishes} 道${plan.offline ? "（内置菜谱离线排）" : ""}`;
+      if (plan.notice) text += ` · ${plan.notice}`;
+      return text;
+    }
+
+    function updateWeeklyStatus() {
+      if (!weeklyPlan || weeklyRequest) return;
+      weeklyStatus.textContent = weeklyStatusText();
+      weeklyDays.classList.toggle("stale", !samePantry(weeklyPlan.ingredients, pantry));
+    }
+
+    function makeWeeklyDayCard(day) {
+      const card = document.createElement("article");
+      card.className = "weekly-day";
+      const head = document.createElement("div");
+      head.className = "weekly-day-head";
+      const name = document.createElement("span");
+      name.className = "weekly-day-name";
+      name.textContent = day.weekday;
+      const date = document.createElement("span");
+      date.className = "weekly-day-date";
+      date.textContent = day.date;
+      head.append(name, date);
+      if (day.isToday) {
+        const today = document.createElement("span");
+        today.className = "weekly-today";
+        today.textContent = "今天";
+        head.append(today);
+      }
+      card.append(head);
+      day.meals.forEach((meal) => {
+        const section = document.createElement("section");
+        section.className = "weekly-meal";
+        const slotLabel = document.createElement("p");
+        slotLabel.className = "weekly-meal-slot";
+        slotLabel.textContent = meal.slot === "lunch" ? "午餐" : "晚餐";
+        section.append(slotLabel);
+        if (!meal.recipe) {
+          const empty = document.createElement("div");
+          empty.className = "weekly-meal-empty";
+          empty.textContent = "暂无可用菜谱";
+          section.append(empty);
+        } else {
+          section.append(makeRecipeCard({ ...meal.recipe, weeklyRepeated: meal.repeated }, 1));
+        }
+        card.append(section);
+      });
+      return card;
+    }
+
+    function renderWeekly() {
+      weeklyDays.replaceChildren();
+      if (!weeklyPlan) {
+        weeklyStatus.textContent = pantry.length ? "添加好食材后，点“生成一周食谱”，由菜谱数据库排出本周午餐和晚餐。" : "先在左侧添加现有食材，再生成一周食谱。";
+        weeklyReshuffleButton.hidden = true;
+        weeklyShopping.hidden = true;
+        weeklyDays.append(makeEmpty("还没有一周食谱", "添加现有食材后点上方按钮，生成 7 天 × 午餐、晚餐 的排菜；生成后离线也能查看。"));
+        return;
+      }
+      const { plan } = weeklyPlan;
+      weeklyStatus.textContent = weeklyStatusText();
+      weeklyReshuffleButton.hidden = false;
+      weeklyDays.classList.toggle("stale", !samePantry(weeklyPlan.ingredients, pantry));
+      plan.days.forEach((day) => weeklyDays.append(makeWeeklyDayCard(day)));
+      weeklyShopping.hidden = !plan.shoppingList.length;
+      weeklyShoppingList.replaceChildren();
+      plan.shoppingList.forEach((item) => {
+        const chip = document.createElement("span");
+        chip.className = "shopping-item";
+        chip.textContent = `${item.name} ×${item.count}`;
+        chip.title = `用到它的菜：${item.meals.join("、")}`;
+        weeklyShoppingList.append(chip);
+      });
+      weeklyGenerateButton.textContent = "按当前食材重新生成";
+    }
+
+    function makeEmpty(title, message) {
+      const empty = document.createElement("div");
+      empty.className = "empty-results";
+      const icon = document.createElement("div");
+      icon.className = "empty-icon";
+      icon.textContent = "🥬";
+      const heading = document.createElement("strong");
+      heading.textContent = title;
+      const copy = document.createElement("p");
+      copy.textContent = message;
+      empty.append(icon, heading, copy);
+      return empty;
+    }
+
+    function makeRecipeCard(recipe, index) {
+      const card = document.createElement("details");
+      card.className = "recipe-card";
+      if (recipe.isBest || index === 0) card.open = true;
+      const summary = document.createElement("summary");
+      summary.className = "recipe-summary";
+      const icon = document.createElement("span");
+      icon.className = "dish-icon";
+      icon.setAttribute("aria-hidden", "true");
+      icon.textContent = recipe.icon;
+      const main = document.createElement("span");
+      main.className = "recipe-main";
+      const titleRow = document.createElement("span");
+      titleRow.className = "recipe-title-row";
+      const title = document.createElement("span");
+      title.className = "recipe-title";
+      title.textContent = recipe.name;
+      const badge = document.createElement("span");
+      badge.className = "match-badge";
+      badge.textContent = recipe.isBest ? "最适合现有食材" : recipe.weeklyRepeated ? "本周重复" : recipe.level;
+      titleRow.append(title, badge);
+      const meta = document.createElement("span");
+      meta.className = "recipe-meta";
+      const time = document.createElement("span");
+      time.textContent = `◷ ${recipe.time} 分钟`;
+      const calories = document.createElement("span");
+      calories.className = "nutrition";
+      calories.textContent = `约 ${recipe.kcal} 千卡`;
+      const protein = document.createElement("span");
+      protein.className = "nutrition";
+      protein.textContent = `蛋白质 ${recipe.protein} 克`;
+      const missing = document.createElement("span");
+      missing.className = recipe.missing.length ? "missing" : "";
+      missing.textContent = recipe.missing.length ? `还差 ${recipe.missing.map(([name]) => name).join("、")}` : "食材基本齐全";
+      meta.append(time, calories, protein, missing);
+      main.append(titleRow, meta);
+      const ring = document.createElement("span");
+      ring.className = "match-ring";
+      ring.textContent = `${Math.round(recipe.score * 100)}%`;
+      ring.setAttribute("aria-label", `食材匹配度${Math.round(recipe.score * 100)}%`);
+      const chevron = document.createElement("span");
+      chevron.className = "chevron";
+      chevron.textContent = "⌄";
+      chevron.setAttribute("aria-hidden", "true");
+      summary.append(icon, main, ring, chevron);
+
+      const details = document.createElement("div");
+      details.className = "recipe-details";
+      const divider = document.createElement("div");
+      divider.className = "detail-divider";
+      const grid = document.createElement("div");
+      grid.className = "detail-grid";
+      const ingredientSection = document.createElement("section");
+      const ingredientHeading = document.createElement("h3");
+      ingredientHeading.textContent = "食材用量（单人份）";
+      const ingredientLines = document.createElement("ul");
+      ingredientLines.className = "ingredient-lines";
+      recipe.ingredients.forEach(([name, amount]) => {
+        const line = document.createElement("li");
+        const ingredient = document.createElement("span");
+        ingredient.className = pantryStaples.has(name) || pantry.includes(canonical(name)) ? "have" : "need";
+        ingredient.textContent = name;
+        const quantity = document.createElement("span");
+        quantity.textContent = amount;
+        line.append(ingredient, quantity);
+        ingredientLines.append(line);
+      });
+      ingredientSection.append(ingredientHeading, ingredientLines);
+      const stepsSection = document.createElement("section");
+      const stepsHeading = document.createElement("h3");
+      stepsHeading.textContent = "做法";
+      const steps = document.createElement("ol");
+      steps.className = "steps";
+      recipe.steps.forEach((step) => {
+        const item = document.createElement("li");
+        item.textContent = step;
+        steps.append(item);
+      });
+      stepsSection.append(stepsHeading, steps);
+      grid.append(ingredientSection, stepsSection);
+      const nutritionNote = document.createElement("p");
+      nutritionNote.className = "nutrition-note";
+      nutritionNote.textContent = `每份约 ${recipe.kcal} 千卡、蛋白质 ${recipe.protein} 克；建议用油 ${recipe.oil}、盐 ${recipe.salt}。营养为估算值，实际会因食材和用量而变化。`;
+      details.append(divider, grid, nutritionNote);
+      card.append(summary, details);
+      return card;
+    }
+
+    document.querySelector("#ingredient-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      addIngredients(input.value);
+    });
+    document.querySelector("#suggestion-list").replaceChildren(...suggestions.map((ingredient) => {
+      const button = document.createElement("button");
+      button.className = "suggestion";
+      button.type = "button";
+      button.textContent = `+ ${ingredient}`;
+      button.dataset.ingredient = ingredient;
+      button.addEventListener("click", () => addIngredients(ingredient));
+      return button;
+    }));
+    document.querySelector("#clear-button").addEventListener("click", () => {
+      if (!pantry.length) { showToast("清单已经是空的啦"); return; }
+      pantry = [];
+      savePantry();
+      render();
+      showToast("食材清单已清空");
+    });
+    nextRecipesButton.addEventListener("click", () => {
+      recipePage += 1;
+      renderRecipes();
+    });
+    cookTab.addEventListener("click", () => setMode("cook"));
+    shoppingTab.addEventListener("click", () => setMode("shopping"));
+    prepTab.addEventListener("click", () => setMode("prep"));
+    howToCookTab.addEventListener("click", () => setMode("howtocook"));
+    weeklyTab.addEventListener("click", () => setMode("weekly"));
+    weeklyGenerateButton.addEventListener("click", () => generateWeekly(false));
+    weeklyReshuffleButton.addEventListener("click", () => generateWeekly(true));
+    weeklyShoppingUseButton.addEventListener("click", () => {
+      const names = (weeklyPlan?.plan.shoppingList || []).map((item) => item.name);
+      if (!names.length) { showToast("本周没有需要补买的食材"); return; }
+      const previousCount = pantry.length;
+      pantry = [...new Set([...pantry, ...names.map(canonical)])];
+      savePantry();
+      render();
+      showToast(`已加入 ${pantry.length - previousCount} 种食材，可以重新生成食谱`);
+    });
+    howToCookRefreshButton.addEventListener("click", () => loadHowToCookIndex(true));
+    howToCookMoreButton.addEventListener("click", () => {
+      howToCookPage += 1;
+      renderHowToCookResults();
+    });
+    document.querySelector("#prep-search-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      renderPrepGuides(prepSearch.value);
+    });
+    document.querySelector("#prep-search-form").addEventListener("input", () => renderPrepGuides(prepSearch.value));
+    document.querySelector("#prep-suggestion-list").replaceChildren(...prepGuides.map((guide) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "prep-suggestion";
+      button.textContent = guide.name;
+      button.addEventListener("click", () => {
+        prepSearch.value = guide.name;
+        renderPrepGuides(guide.name);
+      });
+      return button;
+    }));
+    let installPrompt = null;
+    const installButton = document.querySelector("#install-button");
+    const isInstalled = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+    if (isInstalled) installButton.hidden = true;
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      installPrompt = event;
+    });
+    window.addEventListener("appinstalled", () => {
+      installButton.hidden = true;
+      showToast("一餐灵感已添加到手机");
+    });
+    installButton.addEventListener("click", async () => {
+      if (!window.isSecureContext) {
+        showToast("安装需要 HTTPS 网址；当前页面仍可直接使用。");
+      } else if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
+        showToast("在 Safari 点分享按钮，再选择“添加到主屏幕”。");
+      } else if (installPrompt) {
+        const prompt = installPrompt;
+        installPrompt = null;
+        await prompt.prompt();
+        const choice = await prompt.userChoice;
+        if (choice.outcome === "accepted") showToast("正在安装一餐灵感");
+      } else {
+        showToast("请从浏览器菜单选择“安装应用”或“添加到主屏幕”。");
+      }
+    });
+    if ("serviceWorker" in navigator && window.isSecureContext) {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    }
+    render();
+  </script>
+</body>
+</html>

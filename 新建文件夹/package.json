@@ -1,0 +1,10 @@
+{
+  "name": "one-meal-inspiration",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "db:sync": "node tools/sync-recipes.mjs"
+  }
+}

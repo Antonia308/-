@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "一餐灵感 - 少油少盐菜谱",
+  "short_name": "一餐灵感",
+  "description": "根据现有食材推荐少油少盐的家常菜，附做法与每份营养估算。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f5f4ed",
+  "theme_color": "#285a42",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
